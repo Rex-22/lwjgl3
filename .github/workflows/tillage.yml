@@ -152,7 +152,7 @@ jobs:
         run: |
           dnf -y install epel-release
           dnf config-manager --set-enabled powertools
-          dnf -y install git gcc-toolset-15-gcc gcc-toolset-15-gcc-c++ ant make cmake ninja-build \
+          dnf -y install git gcc-toolset-15-gcc gcc-toolset-15-gcc-c++ gcc-toolset-15-libatomic-devel ant make cmake ninja-build \
             libX11-devel libXt-devel gtk3-devel dbus-devel mesa-libGL-devel mesa-libEGL-devel wayland-devel
       - uses: actions/checkout@v4
         with:
