@@ -121,7 +121,7 @@ jobs:
           git rev-parse HEAD > out\lwjgl.dll.git
       - name: Build bgfx.dll
         shell: bash
-        run: bash tillage/build-bgfx.sh "$BGFX_CMAKE_TAG" out -DCMAKE_C_COMPILER=cl -DCMAKE_CXX_COMPILER=cl ${{ matrix.cmake }}
+        run: '"$BASH" tillage/build-bgfx.sh "$BGFX_CMAKE_TAG" out -DCMAKE_C_COMPILER=cl -DCMAKE_CXX_COMPILER=cl ${{ matrix.cmake }}'
       - uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.classifier }}
@@ -143,8 +143,7 @@ jobs:
           - arch: arm64
             runner: ubuntu-24.04-arm
             classifier: natives-linux-arm64
-    env:
-      LWJGL_BUILD_ARCH: ${{ matrix.arch }}
+    # No LWJGL_BUILD_ARCH: on Linux it selects a cross-compiler prefix, and these runners build natively.
     defaults:
       run:
         shell: bash
