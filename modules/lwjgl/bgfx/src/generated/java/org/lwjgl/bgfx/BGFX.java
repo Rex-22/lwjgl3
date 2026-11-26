@@ -123,7 +123,8 @@ public class BGFX {
             create_frame_buffer_scaled                           = apiGetFunctionAddress(BGFX, "bgfx_create_frame_buffer_scaled"),
             create_frame_buffer_from_handles                     = apiGetFunctionAddress(BGFX, "bgfx_create_frame_buffer_from_handles"),
             create_frame_buffer_from_attachment                  = apiGetFunctionAddress(BGFX, "bgfx_create_frame_buffer_from_attachment"),
-            create_frame_buffer_from_nwh                         = apiGetFunctionAddress(BGFX, "bgfx_create_frame_buffer_from_nwh"),
+            create_frame_buffer_from_swap_chain                  = apiGetFunctionAddress(BGFX, "bgfx_create_frame_buffer_from_swap_chain"),
+            update_swap_chain                                    = apiGetFunctionAddress(BGFX, "bgfx_update_swap_chain"),
             set_frame_buffer_name                                = apiGetFunctionAddress(BGFX, "bgfx_set_frame_buffer_name"),
             get_texture                                          = apiGetFunctionAddress(BGFX, "bgfx_get_texture"),
             destroy_frame_buffer                                 = apiGetFunctionAddress(BGFX, "bgfx_destroy_frame_buffer"),
@@ -141,6 +142,8 @@ public class BGFX {
             set_view_rect                                        = apiGetFunctionAddress(BGFX, "bgfx_set_view_rect"),
             set_view_rect_ratio                                  = apiGetFunctionAddress(BGFX, "bgfx_set_view_rect_ratio"),
             set_view_scissor                                     = apiGetFunctionAddress(BGFX, "bgfx_set_view_scissor"),
+            set_view_depth_bias                                  = apiGetFunctionAddress(BGFX, "bgfx_set_view_depth_bias"),
+            set_view_sample_mask                                 = apiGetFunctionAddress(BGFX, "bgfx_set_view_sample_mask"),
             set_view_clear                                       = apiGetFunctionAddress(BGFX, "bgfx_set_view_clear"),
             set_view_clear_mrt                                   = apiGetFunctionAddress(BGFX, "bgfx_set_view_clear_mrt"),
             set_view_mode                                        = apiGetFunctionAddress(BGFX, "bgfx_set_view_mode"),
@@ -155,12 +158,16 @@ public class BGFX {
             encoder_set_state                                    = apiGetFunctionAddress(BGFX, "bgfx_encoder_set_state"),
             encoder_set_condition                                = apiGetFunctionAddress(BGFX, "bgfx_encoder_set_condition"),
             encoder_set_stencil                                  = apiGetFunctionAddress(BGFX, "bgfx_encoder_set_stencil"),
+            encoder_set_sample_mask                              = apiGetFunctionAddress(BGFX, "bgfx_encoder_set_sample_mask"),
             encoder_set_scissor                                  = apiGetFunctionAddress(BGFX, "bgfx_encoder_set_scissor"),
             encoder_set_scissor_cached                           = apiGetFunctionAddress(BGFX, "bgfx_encoder_set_scissor_cached"),
+            encoder_set_depth_control                            = apiGetFunctionAddress(BGFX, "bgfx_encoder_set_depth_control"),
+            encoder_set_depth_control_cached                     = apiGetFunctionAddress(BGFX, "bgfx_encoder_set_depth_control_cached"),
             encoder_set_transform                                = apiGetFunctionAddress(BGFX, "bgfx_encoder_set_transform"),
             encoder_set_transform_cached                         = apiGetFunctionAddress(BGFX, "bgfx_encoder_set_transform_cached"),
             encoder_alloc_transform                              = apiGetFunctionAddress(BGFX, "bgfx_encoder_alloc_transform"),
             encoder_set_uniform                                  = apiGetFunctionAddress(BGFX, "bgfx_encoder_set_uniform"),
+            encoder_set_uniform_ref                              = apiGetFunctionAddress(BGFX, "bgfx_encoder_set_uniform_ref"),
             set_view_uniform                                     = apiGetFunctionAddress(BGFX, "bgfx_set_view_uniform"),
             set_frame_uniform                                    = apiGetFunctionAddress(BGFX, "bgfx_set_frame_uniform"),
             encoder_set_index_buffer                             = apiGetFunctionAddress(BGFX, "bgfx_encoder_set_index_buffer"),
@@ -203,12 +210,16 @@ public class BGFX {
             set_state                                            = apiGetFunctionAddress(BGFX, "bgfx_set_state"),
             set_condition                                        = apiGetFunctionAddress(BGFX, "bgfx_set_condition"),
             set_stencil                                          = apiGetFunctionAddress(BGFX, "bgfx_set_stencil"),
+            set_sample_mask                                      = apiGetFunctionAddress(BGFX, "bgfx_set_sample_mask"),
             set_scissor                                          = apiGetFunctionAddress(BGFX, "bgfx_set_scissor"),
             set_scissor_cached                                   = apiGetFunctionAddress(BGFX, "bgfx_set_scissor_cached"),
+            set_depth_control                                    = apiGetFunctionAddress(BGFX, "bgfx_set_depth_control"),
+            set_depth_control_cached                             = apiGetFunctionAddress(BGFX, "bgfx_set_depth_control_cached"),
             set_transform                                        = apiGetFunctionAddress(BGFX, "bgfx_set_transform"),
             set_transform_cached                                 = apiGetFunctionAddress(BGFX, "bgfx_set_transform_cached"),
             alloc_transform                                      = apiGetFunctionAddress(BGFX, "bgfx_alloc_transform"),
             set_uniform                                          = apiGetFunctionAddress(BGFX, "bgfx_set_uniform"),
+            set_uniform_ref                                      = apiGetFunctionAddress(BGFX, "bgfx_set_uniform_ref"),
             set_index_buffer                                     = apiGetFunctionAddress(BGFX, "bgfx_set_index_buffer"),
             set_dynamic_index_buffer                             = apiGetFunctionAddress(BGFX, "bgfx_set_dynamic_index_buffer"),
             set_transient_index_buffer                           = apiGetFunctionAddress(BGFX, "bgfx_set_transient_index_buffer"),
@@ -252,7 +263,7 @@ public class BGFX {
         return BGFX;
     }
 
-    public static final int BGFX_API_VERSION = 157;
+    public static final int BGFX_API_VERSION = 172;
 
     public static final short BGFX_INVALID_HANDLE = (short)0xFFFF;
 
@@ -433,6 +444,14 @@ public class BGFX {
         BGFX_DEBUG_PROFILER  = 0x10;
 
     public static final int
+        BGFX_DIAGNOSTIC_NONE            = 0x0,
+        BGFX_DIAGNOSTIC_VERBOSE         = 0x1,
+        BGFX_DIAGNOSTIC_GPU_VALIDATION  = 0x2,
+        BGFX_DIAGNOSTIC_SYNC_VALIDATION = 0x4,
+        BGFX_DIAGNOSTIC_SERIALIZE       = 0x8,
+        BGFX_DIAGNOSTIC_DRAW_VALIDATION = 0x10;
+
+    public static final int
         BGFX_BUFFER_NONE               = 0x0,
         BGFX_BUFFER_COMPUTE_READ       = 0x100,
         BGFX_BUFFER_COMPUTE_WRITE      = 0x200,
@@ -457,13 +476,17 @@ public class BGFX {
         BGFX_TEXTURE_SRGB            = 0x200000000000L,
         BGFX_TEXTURE_BLIT_DST        = 0x400000000000L,
         BGFX_TEXTURE_READ_BACK       = 0x800000000000L,
-        BGFX_TEXTURE_EXTERNAL_SHARED = 0x1000000000000L;
+        BGFX_TEXTURE_EXTERNAL_SHARED = 0x1000000000000L,
+        BGFX_TEXTURE_SRGB_MUTABLE    = 0x40000000000000L;
 
-    public static final int BGFX_TEXTURE_RT_MSAA_SHIFT = 36;
+    public static final int
+        BGFX_TEXTURE_RT_MSAA_SHIFT   = 36,
+        BGFX_TEXTURE_MIP_COUNT_SHIFT = 49;
 
     public static final long
-        BGFX_TEXTURE_RT_MSAA_MASK = 0x7000000000L,
-        BGFX_TEXTURE_RT_MASK      = 0xF000000000L;
+        BGFX_TEXTURE_RT_MSAA_MASK   = 0x7000000000L,
+        BGFX_TEXTURE_RT_MASK        = 0xF000000000L,
+        BGFX_TEXTURE_MIP_COUNT_MASK = 0x3E000000000000L;
 
     public static final int
         BGFX_SAMPLER_NONE             = 0x0,
@@ -493,7 +516,8 @@ public class BGFX {
         BGFX_SAMPLER_COMPARE_NOTEQUAL = 0x60000,
         BGFX_SAMPLER_COMPARE_NEVER    = 0x70000,
         BGFX_SAMPLER_COMPARE_ALWAYS   = 0x80000,
-        BGFX_SAMPLER_SAMPLE_STENCIL   = 0x100000;
+        BGFX_SAMPLER_SAMPLE_STENCIL   = 0x100000,
+        BGFX_SAMPLER_SRGB             = 0x200000;
 
     public static final int
         BGFX_SAMPLER_U_SHIFT            = 0,
@@ -543,72 +567,88 @@ public class BGFX {
         BGFX_RESET_SRGB_BACKBUFFER        = 0x8000,
         BGFX_RESET_HDR10                  = 0x10000,
         BGFX_RESET_HIDPI                  = 0x20000,
-        BGFX_RESET_DEPTH_CLAMP            = 0x40000,
         BGFX_RESET_SUSPEND                = 0x80000,
-        BGFX_RESET_TRANSPARENT_BACKBUFFER = 0x100000;
+        BGFX_RESET_TRANSPARENT_BACKBUFFER = 0x100000,
+        BGFX_RESET_LOW_LATENCY_ON         = 0x400,
+        BGFX_RESET_LOW_LATENCY_BOOST      = 0x800,
+        BGFX_RESET_LOW_LATENCY_SHIFT      = 10,
+        BGFX_RESET_LOW_LATENCY_MASK       = 0xC00;
 
     public static final int
         BGFX_RESET_RESERVED_SHIFT = 31,
         BGFX_RESET_RESERVED_MASK  = 0x80000000;
 
+    public static final int
+        BGFX_SWAP_CHAIN_NONE                   = 0x0,
+        BGFX_SWAP_CHAIN_FULLSCREEN             = 0x1,
+        BGFX_SWAP_CHAIN_FULLSCREEN_SHIFT       = 0,
+        BGFX_SWAP_CHAIN_FULLSCREEN_MASK        = 0x1,
+        BGFX_SWAP_CHAIN_MSAA_X2                = 0x10,
+        BGFX_SWAP_CHAIN_MSAA_X4                = 0x20,
+        BGFX_SWAP_CHAIN_MSAA_X8                = 0x30,
+        BGFX_SWAP_CHAIN_MSAA_X16               = 0x40,
+        BGFX_SWAP_CHAIN_MSAA_SHIFT             = 4,
+        BGFX_SWAP_CHAIN_MSAA_MASK              = 0x70,
+        BGFX_SWAP_CHAIN_SRGB_BACKBUFFER        = 0x8000,
+        BGFX_SWAP_CHAIN_HDR10                  = 0x10000,
+        BGFX_SWAP_CHAIN_HIDPI                  = 0x20000,
+        BGFX_SWAP_CHAIN_TRANSPARENT_BACKBUFFER = 0x100000;
+
     public static final long
-        BGFX_CAPS_ALPHA_TO_COVERAGE        = 0x1L,
-        BGFX_CAPS_BLEND_INDEPENDENT        = 0x2L,
-        BGFX_CAPS_COMPUTE                  = 0x4L,
-        BGFX_CAPS_CONSERVATIVE_RASTER      = 0x8L,
-        BGFX_CAPS_DRAW_INDIRECT            = 0x10L,
-        BGFX_CAPS_DRAW_INDIRECT_COUNT      = 0x20L,
-        BGFX_CAPS_FRAGMENT_DEPTH           = 0x40L,
-        BGFX_CAPS_FRAGMENT_ORDERING        = 0x80L,
-        BGFX_CAPS_GRAPHICS_DEBUGGER        = 0x100L,
-        BGFX_CAPS_HDR10                    = 0x200L,
-        BGFX_CAPS_HIDPI                    = 0x400L,
-        BGFX_CAPS_IMAGE_RW                 = 0x800L,
-        BGFX_CAPS_INDEX32                  = 0x1000L,
-        BGFX_CAPS_INSTANCING               = 0x2000L,
-        BGFX_CAPS_OCCLUSION_QUERY          = 0x4000L,
-        BGFX_CAPS_PRIMITIVE_ID             = 0x8000L,
-        BGFX_CAPS_RENDERER_MULTITHREADED   = 0x10000L,
-        BGFX_CAPS_SWAP_CHAIN               = 0x20000L,
-        BGFX_CAPS_TEXTURE_BLIT             = 0x40000L,
-        BGFX_CAPS_TEXTURE_COMPARE_LEQUAL   = 0x80000L,
-        BGFX_CAPS_TEXTURE_COMPARE_RESERVED = 0x100000L,
-        BGFX_CAPS_TEXTURE_CUBE_ARRAY       = 0x200000L,
-        BGFX_CAPS_TEXTURE_DIRECT_ACCESS    = 0x400000L,
-        BGFX_CAPS_TEXTURE_EXTERNAL         = 0x800000L,
-        BGFX_CAPS_TEXTURE_EXTERNAL_SHARED  = 0x1000000L,
-        BGFX_CAPS_TEXTURE_READ_BACK        = 0x2000000L,
-        BGFX_CAPS_TEXTURE_2D_ARRAY         = 0x4000000L,
-        BGFX_CAPS_TEXTURE_3D               = 0x8000000L,
-        BGFX_CAPS_TRANSPARENT_BACKBUFFER   = 0x10000000L,
-        BGFX_CAPS_VARIABLE_RATE_SHADING    = 0x20000000L,
-        BGFX_CAPS_VERTEX_ATTRIB_HALF       = 0x40000000L,
-        BGFX_CAPS_VERTEX_ATTRIB_UINT10     = 0x80000000L,
-        BGFX_CAPS_VERTEX_ID                = 0x100000000L,
-        BGFX_CAPS_VIDEO_DECODE             = 0x200000000L,
-        BGFX_CAPS_VIEWPORT_LAYER_ARRAY     = 0x400000000L,
-        BGFX_CAPS_TEXTURE_COMPARE_ALL      = BGFX_CAPS_TEXTURE_COMPARE_RESERVED | BGFX_CAPS_TEXTURE_COMPARE_LEQUAL;
+        BGFX_CAPS_BLEND_INDEPENDENT       = 0x1L,
+        BGFX_CAPS_COMPUTE                 = 0x2L,
+        BGFX_CAPS_CONSERVATIVE_RASTER     = 0x4L,
+        BGFX_CAPS_DRAW_INDIRECT           = 0x8L,
+        BGFX_CAPS_DRAW_INDIRECT_COUNT     = 0x10L,
+        BGFX_CAPS_FRAGMENT_ORDERING       = 0x20L,
+        BGFX_CAPS_GRAPHICS_DEBUGGER       = 0x40L,
+        BGFX_CAPS_HDR10                   = 0x80L,
+        BGFX_CAPS_IMAGE_RW                = 0x100L,
+        BGFX_CAPS_INDEX32                 = 0x200L,
+        BGFX_CAPS_LOW_LATENCY             = 0x400L,
+        BGFX_CAPS_PRIMITIVE_ID            = 0x800L,
+        BGFX_CAPS_RENDERER_MULTITHREADED  = 0x1000L,
+        BGFX_CAPS_SHADER_F16              = 0x2000L,
+        BGFX_CAPS_SWAP_CHAIN              = 0x4000L,
+        BGFX_CAPS_TEXTURE_CUBE_ARRAY      = 0x8000L,
+        BGFX_CAPS_TEXTURE_DIRECT_ACCESS   = 0x10000L,
+        BGFX_CAPS_TEXTURE_EXTERNAL        = 0x20000L,
+        BGFX_CAPS_TEXTURE_EXTERNAL_SHARED = 0x40000L,
+        BGFX_CAPS_TRANSPARENT_BACKBUFFER  = 0x80000L,
+        BGFX_CAPS_VARIABLE_RATE_SHADING   = 0x100000L,
+        BGFX_CAPS_VERTEX_ATTRIB_UINT10    = 0x200000L,
+        BGFX_CAPS_VIDEO_DECODE            = 0x400000L,
+        BGFX_CAPS_VIEWPORT_LAYER_ARRAY    = 0x800000L;
 
     public static final int
-        BGFX_CAPS_FORMAT_TEXTURE_NONE             = 0x0,
-        BGFX_CAPS_FORMAT_TEXTURE_2D               = 0x1,
-        BGFX_CAPS_FORMAT_TEXTURE_2D_SRGB          = 0x2,
-        BGFX_CAPS_FORMAT_TEXTURE_2D_EMULATED      = 0x4,
-        BGFX_CAPS_FORMAT_TEXTURE_3D               = 0x8,
-        BGFX_CAPS_FORMAT_TEXTURE_3D_SRGB          = 0x10,
-        BGFX_CAPS_FORMAT_TEXTURE_3D_EMULATED      = 0x20,
-        BGFX_CAPS_FORMAT_TEXTURE_CUBE             = 0x40,
-        BGFX_CAPS_FORMAT_TEXTURE_CUBE_SRGB        = 0x80,
-        BGFX_CAPS_FORMAT_TEXTURE_CUBE_EMULATED    = 0x100,
-        BGFX_CAPS_FORMAT_TEXTURE_VERTEX           = 0x200,
-        BGFX_CAPS_FORMAT_TEXTURE_IMAGE_READ       = 0x400,
-        BGFX_CAPS_FORMAT_TEXTURE_IMAGE_WRITE      = 0x800,
-        BGFX_CAPS_FORMAT_TEXTURE_FRAMEBUFFER      = 0x1000,
-        BGFX_CAPS_FORMAT_TEXTURE_FRAMEBUFFER_MSAA = 0x2000,
-        BGFX_CAPS_FORMAT_TEXTURE_MSAA             = 0x4000,
-        BGFX_CAPS_FORMAT_TEXTURE_MIP_AUTOGEN      = 0x8000,
-        BGFX_CAPS_FORMAT_TEXTURE_BACKBUFFER       = 0x10000,
-        BGFX_CAPS_FORMAT_TEXTURE_VIDEO_DECODE_DST = 0x20000;
+        BGFX_CAPS_FORMAT_TEXTURE_NONE                 = 0x0,
+        BGFX_CAPS_FORMAT_TEXTURE_2D                   = 0x1,
+        BGFX_CAPS_FORMAT_TEXTURE_2D_SRGB              = 0x2,
+        BGFX_CAPS_FORMAT_TEXTURE_2D_EMULATED          = 0x4,
+        BGFX_CAPS_FORMAT_TEXTURE_3D                   = 0x8,
+        BGFX_CAPS_FORMAT_TEXTURE_3D_SRGB              = 0x10,
+        BGFX_CAPS_FORMAT_TEXTURE_3D_EMULATED          = 0x20,
+        BGFX_CAPS_FORMAT_TEXTURE_CUBE                 = 0x40,
+        BGFX_CAPS_FORMAT_TEXTURE_CUBE_SRGB            = 0x80,
+        BGFX_CAPS_FORMAT_TEXTURE_CUBE_EMULATED        = 0x100,
+        BGFX_CAPS_FORMAT_TEXTURE_VERTEX               = 0x200,
+        BGFX_CAPS_FORMAT_TEXTURE_IMAGE_READ           = 0x400,
+        BGFX_CAPS_FORMAT_TEXTURE_IMAGE_WRITE          = 0x800,
+        BGFX_CAPS_FORMAT_TEXTURE_FRAMEBUFFER          = 0x1000,
+        BGFX_CAPS_FORMAT_TEXTURE_MSAA                 = 0x2000,
+        BGFX_CAPS_FORMAT_TEXTURE_MIP_AUTOGEN          = 0x4000,
+        BGFX_CAPS_FORMAT_TEXTURE_BACKBUFFER           = 0x8000,
+        BGFX_CAPS_FORMAT_TEXTURE_VIDEO_DECODE_DST     = 0x10000,
+        BGFX_CAPS_FORMAT_TEXTURE_FRAMEBUFFER_MSAA_X2  = 0x20000,
+        BGFX_CAPS_FORMAT_TEXTURE_FRAMEBUFFER_MSAA_X4  = 0x40000,
+        BGFX_CAPS_FORMAT_TEXTURE_FRAMEBUFFER_MSAA_X8  = 0x80000,
+        BGFX_CAPS_FORMAT_TEXTURE_FRAMEBUFFER_MSAA_X16 = 0x100000,
+        BGFX_CAPS_FORMAT_TEXTURE_FRAMEBUFFER_MSAA     = (0
+        | BGFX_CAPS_FORMAT_TEXTURE_FRAMEBUFFER_MSAA_X2
+        | BGFX_CAPS_FORMAT_TEXTURE_FRAMEBUFFER_MSAA_X4
+        | BGFX_CAPS_FORMAT_TEXTURE_FRAMEBUFFER_MSAA_X8
+        | BGFX_CAPS_FORMAT_TEXTURE_FRAMEBUFFER_MSAA_X16)
+        ;
 
     public static final int
         BGFX_CAPS_VIDEO_CODEC_NONE       = 0x0,
@@ -631,8 +671,11 @@ public class BGFX {
         BGFX_VIDEO_DECODE_FRAME_LOOP    = 0x8;
 
     public static final byte
-        BGFX_RESOLVE_NONE          = 0x0,
-        BGFX_RESOLVE_AUTO_GEN_MIPS = 0x1;
+        BGFX_ATTACHMENT_NONE              = 0x0,
+        BGFX_ATTACHMENT_AUTO_GEN_MIPS     = 0x1,
+        BGFX_ATTACHMENT_READ_ONLY_DEPTH   = 0x2,
+        BGFX_ATTACHMENT_READ_ONLY_STENCIL = 0x4,
+        BGFX_ATTACHMENT_SRGB              = 0x8;
 
     public static final short
         BGFX_PCI_ID_NONE                = 0x0,
@@ -642,7 +685,8 @@ public class BGFX {
         BGFX_PCI_ID_INTEL               = (short)0x8086,
         BGFX_PCI_ID_NVIDIA              = 0x10DE,
         BGFX_PCI_ID_MICROSOFT           = 0x1414,
-        BGFX_PCI_ID_ARM                 = 0x13B5;
+        BGFX_PCI_ID_ARM                 = 0x13B5,
+        BGFX_PCI_ID_GOOGLE              = 0x1AE0;
 
     public static final byte
         BGFX_CUBE_MAP_POSITIVE_X = 0x0,
@@ -909,6 +953,12 @@ public class BGFX {
         BGFX_VIEW_MODE_COUNT            = 4;
 
     public static final int
+        BGFX_VIEW_STATS_TYPE_BLIT    = 0,
+        BGFX_VIEW_STATS_TYPE_COMPUTE = 1,
+        BGFX_VIEW_STATS_TYPE_DRAW    = 2,
+        BGFX_VIEW_STATS_TYPE_COUNT   = 3;
+
+    public static final int
         BGFX_SHADING_RATE_RATE_1X_1 = 0,
         BGFX_SHADING_RATE_RATE_1X_2 = 1,
         BGFX_SHADING_RATE_RATE_2X_1 = 2,
@@ -996,15 +1046,15 @@ public class BGFX {
 
     // --- [ bgfx_attachment_init ] ---
 
-    /** {@code void bgfx_attachment_init(bgfx_attachment_t * _this, bgfx_texture_handle_t _handle, bgfx_access_t _access, uint16_t _layer, uint16_t _numLayers, uint16_t _mip, uint8_t _resolve)} */
-    public static void nbgfx_attachment_init(long _this, short _handle, int _access, short _layer, short _numLayers, short _mip, byte _resolve) {
+    /** {@code void bgfx_attachment_init(bgfx_attachment_t * _this, bgfx_texture_handle_t _handle, bgfx_access_t _access, uint16_t _layer, uint16_t _numLayers, uint16_t _mip, uint8_t _flags)} */
+    public static void nbgfx_attachment_init(long _this, short _handle, int _access, short _layer, short _numLayers, short _mip, byte _flags) {
         long __functionAddress = Functions.attachment_init;
-        invokePCCCCUV(_this, _handle, _access, _layer, _numLayers, _mip, _resolve, __functionAddress);
+        invokePCCCCUV(_this, _handle, _access, _layer, _numLayers, _mip, _flags, __functionAddress);
     }
 
-    /** {@code void bgfx_attachment_init(bgfx_attachment_t * _this, bgfx_texture_handle_t _handle, bgfx_access_t _access, uint16_t _layer, uint16_t _numLayers, uint16_t _mip, uint8_t _resolve)} */
-    public static void bgfx_attachment_init(@NativeType("bgfx_attachment_t *") BGFXAttachment _this, @NativeType("bgfx_texture_handle_t") short _handle, @NativeType("bgfx_access_t") int _access, @NativeType("uint16_t") int _layer, @NativeType("uint16_t") int _numLayers, @NativeType("uint16_t") int _mip, @NativeType("uint8_t") int _resolve) {
-        nbgfx_attachment_init(_this.address(), _handle, _access, (short)_layer, (short)_numLayers, (short)_mip, (byte)_resolve);
+    /** {@code void bgfx_attachment_init(bgfx_attachment_t * _this, bgfx_texture_handle_t _handle, bgfx_access_t _access, uint16_t _layer, uint16_t _numLayers, uint16_t _mip, uint8_t _flags)} */
+    public static void bgfx_attachment_init(@NativeType("bgfx_attachment_t *") BGFXAttachment _this, @NativeType("bgfx_texture_handle_t") short _handle, @NativeType("bgfx_access_t") int _access, @NativeType("uint16_t") int _layer, @NativeType("uint16_t") int _numLayers, @NativeType("uint16_t") int _mip, @NativeType("uint8_t") int _flags) {
+        nbgfx_attachment_init(_this.address(), _handle, _access, (short)_layer, (short)_numLayers, (short)_mip, (byte)_flags);
     }
 
     // --- [ bgfx_vertex_layout_begin ] ---
@@ -1315,10 +1365,15 @@ public class BGFX {
 
     // --- [ bgfx_reset ] ---
 
-    /** {@code void bgfx_reset(uint32_t _width, uint32_t _height, uint32_t _flags, bgfx_texture_format_t _format)} */
-    public static void bgfx_reset(@NativeType("uint32_t") int _width, @NativeType("uint32_t") int _height, @NativeType("uint32_t") int _flags, @NativeType("bgfx_texture_format_t") int _format) {
+    /** {@code void bgfx_reset(uint32_t _flags, bgfx_swap_chain_t const * _swapChain)} */
+    public static void nbgfx_reset(int _flags, long _swapChain) {
         long __functionAddress = Functions.reset;
-        invokeV(_width, _height, _flags, _format, __functionAddress);
+        invokePV(_flags, _swapChain, __functionAddress);
+    }
+
+    /** {@code void bgfx_reset(uint32_t _flags, bgfx_swap_chain_t const * _swapChain)} */
+    public static void bgfx_reset(@NativeType("uint32_t") int _flags, @NativeType("bgfx_swap_chain_t const *") @Nullable BGFXSwapChain _swapChain) {
+        nbgfx_reset(_flags, memAddressSafe(_swapChain));
     }
 
     // --- [ bgfx_frame ] ---
@@ -1562,10 +1617,15 @@ public class BGFX {
 
     // --- [ bgfx_set_debug ] ---
 
-    /** {@code void bgfx_set_debug(uint32_t _debug)} */
-    public static void bgfx_set_debug(@NativeType("uint32_t") int _debug) {
+    /** {@code void bgfx_set_debug(uint32_t _debug, bgfx_frame_buffer_handle_t _handle, uint8_t _scale)} */
+    public static void nbgfx_set_debug(int _debug, short _handle, byte _scale) {
         long __functionAddress = Functions.set_debug;
-        invokeV(_debug, __functionAddress);
+        invokeCUV(_debug, _handle, _scale, __functionAddress);
+    }
+
+    /** {@code void bgfx_set_debug(uint32_t _debug, bgfx_frame_buffer_handle_t _handle, uint8_t _scale)} */
+    public static void bgfx_set_debug(@NativeType("uint32_t") int _debug, @NativeType("bgfx_frame_buffer_handle_t") short _handle, @NativeType("uint8_t") int _scale) {
+        nbgfx_set_debug(_debug, _handle, (byte)_scale);
     }
 
     // --- [ bgfx_dbg_text_clear ] ---
@@ -2458,21 +2518,31 @@ public class BGFX {
         return nbgfx_create_frame_buffer_from_attachment((byte)_attachment.remaining(), _attachment.address(), _destroyTextures);
     }
 
-    // --- [ bgfx_create_frame_buffer_from_nwh ] ---
+    // --- [ bgfx_create_frame_buffer_from_swap_chain ] ---
 
-    /** {@code bgfx_frame_buffer_handle_t bgfx_create_frame_buffer_from_nwh(void * _nwh, uint16_t _width, uint16_t _height, bgfx_texture_format_t _format, bgfx_texture_format_t _depthFormat)} */
-    public static short nbgfx_create_frame_buffer_from_nwh(long _nwh, short _width, short _height, int _format, int _depthFormat) {
-        long __functionAddress = Functions.create_frame_buffer_from_nwh;
-        if (CHECKS) {
-            check(_nwh);
-        }
-        return invokePCCC(_nwh, _width, _height, _format, _depthFormat, __functionAddress);
+    /** {@code bgfx_frame_buffer_handle_t bgfx_create_frame_buffer_from_swap_chain(bgfx_swap_chain_t const * _desc)} */
+    public static short nbgfx_create_frame_buffer_from_swap_chain(long _desc) {
+        long __functionAddress = Functions.create_frame_buffer_from_swap_chain;
+        return invokePC(_desc, __functionAddress);
     }
 
-    /** {@code bgfx_frame_buffer_handle_t bgfx_create_frame_buffer_from_nwh(void * _nwh, uint16_t _width, uint16_t _height, bgfx_texture_format_t _format, bgfx_texture_format_t _depthFormat)} */
+    /** {@code bgfx_frame_buffer_handle_t bgfx_create_frame_buffer_from_swap_chain(bgfx_swap_chain_t const * _desc)} */
     @NativeType("bgfx_frame_buffer_handle_t")
-    public static short bgfx_create_frame_buffer_from_nwh(@NativeType("void *") long _nwh, @NativeType("uint16_t") int _width, @NativeType("uint16_t") int _height, @NativeType("bgfx_texture_format_t") int _format, @NativeType("bgfx_texture_format_t") int _depthFormat) {
-        return nbgfx_create_frame_buffer_from_nwh(_nwh, (short)_width, (short)_height, _format, _depthFormat);
+    public static short bgfx_create_frame_buffer_from_swap_chain(@NativeType("bgfx_swap_chain_t const *") BGFXSwapChain _desc) {
+        return nbgfx_create_frame_buffer_from_swap_chain(_desc.address());
+    }
+
+    // --- [ bgfx_update_swap_chain ] ---
+
+    /** {@code void bgfx_update_swap_chain(bgfx_frame_buffer_handle_t _handle, bgfx_swap_chain_t const * _desc)} */
+    public static void nbgfx_update_swap_chain(short _handle, long _desc) {
+        long __functionAddress = Functions.update_swap_chain;
+        invokeCPV(_handle, _desc, __functionAddress);
+    }
+
+    /** {@code void bgfx_update_swap_chain(bgfx_frame_buffer_handle_t _handle, bgfx_swap_chain_t const * _desc)} */
+    public static void bgfx_update_swap_chain(@NativeType("bgfx_frame_buffer_handle_t") short _handle, @NativeType("bgfx_swap_chain_t const *") BGFXSwapChain _desc) {
+        nbgfx_update_swap_chain(_handle, _desc.address());
     }
 
     // --- [ bgfx_set_frame_buffer_name ] ---
@@ -2706,15 +2776,15 @@ public class BGFX {
 
     // --- [ bgfx_set_view_rect ] ---
 
-    /** {@code void bgfx_set_view_rect(bgfx_view_id_t _id, int16_t _x, int16_t _y, uint16_t _width, uint16_t _height)} */
-    public static void nbgfx_set_view_rect(short _id, short _x, short _y, short _width, short _height) {
+    /** {@code void bgfx_set_view_rect(bgfx_view_id_t _id, int16_t _x, int16_t _y, uint16_t _width, uint16_t _height, float _minDepth, float _maxDepth)} */
+    public static void nbgfx_set_view_rect(short _id, short _x, short _y, short _width, short _height, float _minDepth, float _maxDepth) {
         long __functionAddress = Functions.set_view_rect;
-        invokeCSSCCV(_id, _x, _y, _width, _height, __functionAddress);
+        invokeCSSCCV(_id, _x, _y, _width, _height, _minDepth, _maxDepth, __functionAddress);
     }
 
-    /** {@code void bgfx_set_view_rect(bgfx_view_id_t _id, int16_t _x, int16_t _y, uint16_t _width, uint16_t _height)} */
-    public static void bgfx_set_view_rect(@NativeType("bgfx_view_id_t") int _id, @NativeType("int16_t") int _x, @NativeType("int16_t") int _y, @NativeType("uint16_t") int _width, @NativeType("uint16_t") int _height) {
-        nbgfx_set_view_rect((short)_id, (short)_x, (short)_y, (short)_width, (short)_height);
+    /** {@code void bgfx_set_view_rect(bgfx_view_id_t _id, int16_t _x, int16_t _y, uint16_t _width, uint16_t _height, float _minDepth, float _maxDepth)} */
+    public static void bgfx_set_view_rect(@NativeType("bgfx_view_id_t") int _id, @NativeType("int16_t") int _x, @NativeType("int16_t") int _y, @NativeType("uint16_t") int _width, @NativeType("uint16_t") int _height, float _minDepth, float _maxDepth) {
+        nbgfx_set_view_rect((short)_id, (short)_x, (short)_y, (short)_width, (short)_height, _minDepth, _maxDepth);
     }
 
     // --- [ bgfx_set_view_rect_ratio ] ---
@@ -2741,6 +2811,32 @@ public class BGFX {
     /** {@code void bgfx_set_view_scissor(bgfx_view_id_t _id, uint16_t _x, uint16_t _y, uint16_t _width, uint16_t _height)} */
     public static void bgfx_set_view_scissor(@NativeType("bgfx_view_id_t") int _id, @NativeType("uint16_t") int _x, @NativeType("uint16_t") int _y, @NativeType("uint16_t") int _width, @NativeType("uint16_t") int _height) {
         nbgfx_set_view_scissor((short)_id, (short)_x, (short)_y, (short)_width, (short)_height);
+    }
+
+    // --- [ bgfx_set_view_depth_bias ] ---
+
+    /** {@code void bgfx_set_view_depth_bias(bgfx_view_id_t _id, int32_t _constant, float _slopeScale, float _clamp)} */
+    public static void nbgfx_set_view_depth_bias(short _id, int _constant, float _slopeScale, float _clamp) {
+        long __functionAddress = Functions.set_view_depth_bias;
+        invokeCV(_id, _constant, _slopeScale, _clamp, __functionAddress);
+    }
+
+    /** {@code void bgfx_set_view_depth_bias(bgfx_view_id_t _id, int32_t _constant, float _slopeScale, float _clamp)} */
+    public static void bgfx_set_view_depth_bias(@NativeType("bgfx_view_id_t") int _id, @NativeType("int32_t") int _constant, float _slopeScale, float _clamp) {
+        nbgfx_set_view_depth_bias((short)_id, _constant, _slopeScale, _clamp);
+    }
+
+    // --- [ bgfx_set_view_sample_mask ] ---
+
+    /** {@code void bgfx_set_view_sample_mask(bgfx_view_id_t _id, uint32_t _mask)} */
+    public static void nbgfx_set_view_sample_mask(short _id, int _mask) {
+        long __functionAddress = Functions.set_view_sample_mask;
+        invokeCV(_id, _mask, __functionAddress);
+    }
+
+    /** {@code void bgfx_set_view_sample_mask(bgfx_view_id_t _id, uint32_t _mask)} */
+    public static void bgfx_set_view_sample_mask(@NativeType("bgfx_view_id_t") int _id, @NativeType("uint32_t") int _mask) {
+        nbgfx_set_view_sample_mask((short)_id, _mask);
     }
 
     // --- [ bgfx_set_view_clear ] ---
@@ -2944,6 +3040,17 @@ public class BGFX {
         invokePV(_this, _fstencil, _bstencil, __functionAddress);
     }
 
+    // --- [ bgfx_encoder_set_sample_mask ] ---
+
+    /** {@code void bgfx_encoder_set_sample_mask(bgfx_encoder_t * _this, uint32_t _mask)} */
+    public static void bgfx_encoder_set_sample_mask(@NativeType("bgfx_encoder_t *") long _this, @NativeType("uint32_t") int _mask) {
+        long __functionAddress = Functions.encoder_set_sample_mask;
+        if (CHECKS) {
+            check(_this);
+        }
+        invokePV(_this, _mask, __functionAddress);
+    }
+
     // --- [ bgfx_encoder_set_scissor ] ---
 
     /** {@code uint16_t bgfx_encoder_set_scissor(bgfx_encoder_t * _this, uint16_t _x, uint16_t _y, uint16_t _width, uint16_t _height)} */
@@ -2975,6 +3082,34 @@ public class BGFX {
     /** {@code void bgfx_encoder_set_scissor_cached(bgfx_encoder_t * _this, uint16_t _cache)} */
     public static void bgfx_encoder_set_scissor_cached(@NativeType("bgfx_encoder_t *") long _this, @NativeType("uint16_t") int _cache) {
         nbgfx_encoder_set_scissor_cached(_this, (short)_cache);
+    }
+
+    // --- [ bgfx_encoder_set_depth_control ] ---
+
+    /** {@code uint16_t bgfx_encoder_set_depth_control(bgfx_encoder_t * _this, int32_t _constant, float _slopeScale, float _clamp, bool _depthClamp)} */
+    @NativeType("uint16_t")
+    public static short bgfx_encoder_set_depth_control(@NativeType("bgfx_encoder_t *") long _this, @NativeType("int32_t") int _constant, float _slopeScale, float _clamp, @NativeType("bool") boolean _depthClamp) {
+        long __functionAddress = Functions.encoder_set_depth_control;
+        if (CHECKS) {
+            check(_this);
+        }
+        return invokePC(_this, _constant, _slopeScale, _clamp, _depthClamp, __functionAddress);
+    }
+
+    // --- [ bgfx_encoder_set_depth_control_cached ] ---
+
+    /** {@code void bgfx_encoder_set_depth_control_cached(bgfx_encoder_t * _this, uint16_t _cache)} */
+    public static void nbgfx_encoder_set_depth_control_cached(long _this, short _cache) {
+        long __functionAddress = Functions.encoder_set_depth_control_cached;
+        if (CHECKS) {
+            check(_this);
+        }
+        invokePCV(_this, _cache, __functionAddress);
+    }
+
+    /** {@code void bgfx_encoder_set_depth_control_cached(bgfx_encoder_t * _this, uint16_t _cache)} */
+    public static void bgfx_encoder_set_depth_control_cached(@NativeType("bgfx_encoder_t *") long _this, @NativeType("uint16_t") int _cache) {
+        nbgfx_encoder_set_depth_control_cached(_this, (short)_cache);
     }
 
     // --- [ bgfx_encoder_set_transform ] ---
@@ -3072,6 +3207,47 @@ public class BGFX {
     /** {@code void bgfx_encoder_set_uniform(bgfx_encoder_t * _this, bgfx_uniform_handle_t _handle, void const * _value, uint16_t _num)} */
     public static void bgfx_encoder_set_uniform(@NativeType("bgfx_encoder_t *") long _this, @NativeType("bgfx_uniform_handle_t") short _handle, @NativeType("void const *") DoubleBuffer _value, @NativeType("uint16_t") int _num) {
         nbgfx_encoder_set_uniform(_this, _handle, memAddress(_value), (short)_num);
+    }
+
+    // --- [ bgfx_encoder_set_uniform_ref ] ---
+
+    /** {@code void bgfx_encoder_set_uniform_ref(bgfx_encoder_t * _this, bgfx_uniform_handle_t _handle, void const * _value, uint16_t _num)} */
+    public static void nbgfx_encoder_set_uniform_ref(long _this, short _handle, long _value, short _num) {
+        long __functionAddress = Functions.encoder_set_uniform_ref;
+        if (CHECKS) {
+            check(_this);
+        }
+        invokePCPCV(_this, _handle, _value, _num, __functionAddress);
+    }
+
+    /** {@code void bgfx_encoder_set_uniform_ref(bgfx_encoder_t * _this, bgfx_uniform_handle_t _handle, void const * _value, uint16_t _num)} */
+    public static void bgfx_encoder_set_uniform_ref(@NativeType("bgfx_encoder_t *") long _this, @NativeType("bgfx_uniform_handle_t") short _handle, @NativeType("void const *") ByteBuffer _value, @NativeType("uint16_t") int _num) {
+        nbgfx_encoder_set_uniform_ref(_this, _handle, memAddress(_value), (short)_num);
+    }
+
+    /** {@code void bgfx_encoder_set_uniform_ref(bgfx_encoder_t * _this, bgfx_uniform_handle_t _handle, void const * _value, uint16_t _num)} */
+    public static void bgfx_encoder_set_uniform_ref(@NativeType("bgfx_encoder_t *") long _this, @NativeType("bgfx_uniform_handle_t") short _handle, @NativeType("void const *") ShortBuffer _value, @NativeType("uint16_t") int _num) {
+        nbgfx_encoder_set_uniform_ref(_this, _handle, memAddress(_value), (short)_num);
+    }
+
+    /** {@code void bgfx_encoder_set_uniform_ref(bgfx_encoder_t * _this, bgfx_uniform_handle_t _handle, void const * _value, uint16_t _num)} */
+    public static void bgfx_encoder_set_uniform_ref(@NativeType("bgfx_encoder_t *") long _this, @NativeType("bgfx_uniform_handle_t") short _handle, @NativeType("void const *") IntBuffer _value, @NativeType("uint16_t") int _num) {
+        nbgfx_encoder_set_uniform_ref(_this, _handle, memAddress(_value), (short)_num);
+    }
+
+    /** {@code void bgfx_encoder_set_uniform_ref(bgfx_encoder_t * _this, bgfx_uniform_handle_t _handle, void const * _value, uint16_t _num)} */
+    public static void bgfx_encoder_set_uniform_ref(@NativeType("bgfx_encoder_t *") long _this, @NativeType("bgfx_uniform_handle_t") short _handle, @NativeType("void const *") LongBuffer _value, @NativeType("uint16_t") int _num) {
+        nbgfx_encoder_set_uniform_ref(_this, _handle, memAddress(_value), (short)_num);
+    }
+
+    /** {@code void bgfx_encoder_set_uniform_ref(bgfx_encoder_t * _this, bgfx_uniform_handle_t _handle, void const * _value, uint16_t _num)} */
+    public static void bgfx_encoder_set_uniform_ref(@NativeType("bgfx_encoder_t *") long _this, @NativeType("bgfx_uniform_handle_t") short _handle, @NativeType("void const *") FloatBuffer _value, @NativeType("uint16_t") int _num) {
+        nbgfx_encoder_set_uniform_ref(_this, _handle, memAddress(_value), (short)_num);
+    }
+
+    /** {@code void bgfx_encoder_set_uniform_ref(bgfx_encoder_t * _this, bgfx_uniform_handle_t _handle, void const * _value, uint16_t _num)} */
+    public static void bgfx_encoder_set_uniform_ref(@NativeType("bgfx_encoder_t *") long _this, @NativeType("bgfx_uniform_handle_t") short _handle, @NativeType("void const *") DoubleBuffer _value, @NativeType("uint16_t") int _num) {
+        nbgfx_encoder_set_uniform_ref(_this, _handle, memAddress(_value), (short)_num);
     }
 
     // --- [ bgfx_set_view_uniform ] ---
@@ -3366,18 +3542,18 @@ public class BGFX {
 
     // --- [ bgfx_encoder_set_texture_view ] ---
 
-    /** {@code void bgfx_encoder_set_texture_view(bgfx_encoder_t * _this, uint8_t _stage, bgfx_uniform_handle_t _sampler, bgfx_texture_handle_t _handle, uint16_t _firstLayer, uint16_t _numLayers, uint8_t _firstMip, uint8_t _numMips, uint32_t _flags)} */
-    public static void nbgfx_encoder_set_texture_view(long _this, byte _stage, short _sampler, short _handle, short _firstLayer, short _numLayers, byte _firstMip, byte _numMips, int _flags) {
+    /** {@code void bgfx_encoder_set_texture_view(bgfx_encoder_t * _this, uint8_t _stage, bgfx_uniform_handle_t _sampler, bgfx_texture_handle_t _handle, uint16_t _firstLayer, uint16_t _numLayers, uint8_t _firstMip, uint8_t _numMips, uint32_t _flags, uint8_t _lodMin, uint8_t _lodMax)} */
+    public static void nbgfx_encoder_set_texture_view(long _this, byte _stage, short _sampler, short _handle, short _firstLayer, short _numLayers, byte _firstMip, byte _numMips, int _flags, byte _lodMin, byte _lodMax) {
         long __functionAddress = Functions.encoder_set_texture_view;
         if (CHECKS) {
             check(_this);
         }
-        invokePUCCCCUUV(_this, _stage, _sampler, _handle, _firstLayer, _numLayers, _firstMip, _numMips, _flags, __functionAddress);
+        invokePUCCCCUUUUV(_this, _stage, _sampler, _handle, _firstLayer, _numLayers, _firstMip, _numMips, _flags, _lodMin, _lodMax, __functionAddress);
     }
 
-    /** {@code void bgfx_encoder_set_texture_view(bgfx_encoder_t * _this, uint8_t _stage, bgfx_uniform_handle_t _sampler, bgfx_texture_handle_t _handle, uint16_t _firstLayer, uint16_t _numLayers, uint8_t _firstMip, uint8_t _numMips, uint32_t _flags)} */
-    public static void bgfx_encoder_set_texture_view(@NativeType("bgfx_encoder_t *") long _this, @NativeType("uint8_t") int _stage, @NativeType("bgfx_uniform_handle_t") short _sampler, @NativeType("bgfx_texture_handle_t") short _handle, @NativeType("uint16_t") int _firstLayer, @NativeType("uint16_t") int _numLayers, @NativeType("uint8_t") int _firstMip, @NativeType("uint8_t") int _numMips, @NativeType("uint32_t") int _flags) {
-        nbgfx_encoder_set_texture_view(_this, (byte)_stage, _sampler, _handle, (short)_firstLayer, (short)_numLayers, (byte)_firstMip, (byte)_numMips, _flags);
+    /** {@code void bgfx_encoder_set_texture_view(bgfx_encoder_t * _this, uint8_t _stage, bgfx_uniform_handle_t _sampler, bgfx_texture_handle_t _handle, uint16_t _firstLayer, uint16_t _numLayers, uint8_t _firstMip, uint8_t _numMips, uint32_t _flags, uint8_t _lodMin, uint8_t _lodMax)} */
+    public static void bgfx_encoder_set_texture_view(@NativeType("bgfx_encoder_t *") long _this, @NativeType("uint8_t") int _stage, @NativeType("bgfx_uniform_handle_t") short _sampler, @NativeType("bgfx_texture_handle_t") short _handle, @NativeType("uint16_t") int _firstLayer, @NativeType("uint16_t") int _numLayers, @NativeType("uint8_t") int _firstMip, @NativeType("uint8_t") int _numMips, @NativeType("uint32_t") int _flags, @NativeType("uint8_t") int _lodMin, @NativeType("uint8_t") int _lodMax) {
+        nbgfx_encoder_set_texture_view(_this, (byte)_stage, _sampler, _handle, (short)_firstLayer, (short)_numLayers, (byte)_firstMip, (byte)_numMips, _flags, (byte)_lodMin, (byte)_lodMax);
     }
 
     // --- [ bgfx_encoder_touch ] ---
@@ -3462,66 +3638,66 @@ public class BGFX {
 
     // --- [ bgfx_encoder_set_compute_index_buffer ] ---
 
-    /** {@code void bgfx_encoder_set_compute_index_buffer(bgfx_encoder_t * _this, uint8_t _stage, bgfx_index_buffer_handle_t _handle, bgfx_access_t _access)} */
-    public static void nbgfx_encoder_set_compute_index_buffer(long _this, byte _stage, short _handle, int _access) {
+    /** {@code void bgfx_encoder_set_compute_index_buffer(bgfx_encoder_t * _this, uint8_t _stage, bgfx_index_buffer_handle_t _handle, bgfx_access_t _access, uint32_t _offset, uint32_t _size)} */
+    public static void nbgfx_encoder_set_compute_index_buffer(long _this, byte _stage, short _handle, int _access, int _offset, int _size) {
         long __functionAddress = Functions.encoder_set_compute_index_buffer;
         if (CHECKS) {
             check(_this);
         }
-        invokePUCV(_this, _stage, _handle, _access, __functionAddress);
+        invokePUCV(_this, _stage, _handle, _access, _offset, _size, __functionAddress);
     }
 
-    /** {@code void bgfx_encoder_set_compute_index_buffer(bgfx_encoder_t * _this, uint8_t _stage, bgfx_index_buffer_handle_t _handle, bgfx_access_t _access)} */
-    public static void bgfx_encoder_set_compute_index_buffer(@NativeType("bgfx_encoder_t *") long _this, @NativeType("uint8_t") int _stage, @NativeType("bgfx_index_buffer_handle_t") short _handle, @NativeType("bgfx_access_t") int _access) {
-        nbgfx_encoder_set_compute_index_buffer(_this, (byte)_stage, _handle, _access);
+    /** {@code void bgfx_encoder_set_compute_index_buffer(bgfx_encoder_t * _this, uint8_t _stage, bgfx_index_buffer_handle_t _handle, bgfx_access_t _access, uint32_t _offset, uint32_t _size)} */
+    public static void bgfx_encoder_set_compute_index_buffer(@NativeType("bgfx_encoder_t *") long _this, @NativeType("uint8_t") int _stage, @NativeType("bgfx_index_buffer_handle_t") short _handle, @NativeType("bgfx_access_t") int _access, @NativeType("uint32_t") int _offset, @NativeType("uint32_t") int _size) {
+        nbgfx_encoder_set_compute_index_buffer(_this, (byte)_stage, _handle, _access, _offset, _size);
     }
 
     // --- [ bgfx_encoder_set_compute_vertex_buffer ] ---
 
-    /** {@code void bgfx_encoder_set_compute_vertex_buffer(bgfx_encoder_t * _this, uint8_t _stage, bgfx_vertex_buffer_handle_t _handle, bgfx_access_t _access)} */
-    public static void nbgfx_encoder_set_compute_vertex_buffer(long _this, byte _stage, short _handle, int _access) {
+    /** {@code void bgfx_encoder_set_compute_vertex_buffer(bgfx_encoder_t * _this, uint8_t _stage, bgfx_vertex_buffer_handle_t _handle, bgfx_access_t _access, uint32_t _offset, uint32_t _size)} */
+    public static void nbgfx_encoder_set_compute_vertex_buffer(long _this, byte _stage, short _handle, int _access, int _offset, int _size) {
         long __functionAddress = Functions.encoder_set_compute_vertex_buffer;
         if (CHECKS) {
             check(_this);
         }
-        invokePUCV(_this, _stage, _handle, _access, __functionAddress);
+        invokePUCV(_this, _stage, _handle, _access, _offset, _size, __functionAddress);
     }
 
-    /** {@code void bgfx_encoder_set_compute_vertex_buffer(bgfx_encoder_t * _this, uint8_t _stage, bgfx_vertex_buffer_handle_t _handle, bgfx_access_t _access)} */
-    public static void bgfx_encoder_set_compute_vertex_buffer(@NativeType("bgfx_encoder_t *") long _this, @NativeType("uint8_t") int _stage, @NativeType("bgfx_vertex_buffer_handle_t") short _handle, @NativeType("bgfx_access_t") int _access) {
-        nbgfx_encoder_set_compute_vertex_buffer(_this, (byte)_stage, _handle, _access);
+    /** {@code void bgfx_encoder_set_compute_vertex_buffer(bgfx_encoder_t * _this, uint8_t _stage, bgfx_vertex_buffer_handle_t _handle, bgfx_access_t _access, uint32_t _offset, uint32_t _size)} */
+    public static void bgfx_encoder_set_compute_vertex_buffer(@NativeType("bgfx_encoder_t *") long _this, @NativeType("uint8_t") int _stage, @NativeType("bgfx_vertex_buffer_handle_t") short _handle, @NativeType("bgfx_access_t") int _access, @NativeType("uint32_t") int _offset, @NativeType("uint32_t") int _size) {
+        nbgfx_encoder_set_compute_vertex_buffer(_this, (byte)_stage, _handle, _access, _offset, _size);
     }
 
     // --- [ bgfx_encoder_set_compute_dynamic_index_buffer ] ---
 
-    /** {@code void bgfx_encoder_set_compute_dynamic_index_buffer(bgfx_encoder_t * _this, uint8_t _stage, bgfx_dynamic_index_buffer_handle_t _handle, bgfx_access_t _access)} */
-    public static void nbgfx_encoder_set_compute_dynamic_index_buffer(long _this, byte _stage, short _handle, int _access) {
+    /** {@code void bgfx_encoder_set_compute_dynamic_index_buffer(bgfx_encoder_t * _this, uint8_t _stage, bgfx_dynamic_index_buffer_handle_t _handle, bgfx_access_t _access, uint32_t _offset, uint32_t _size)} */
+    public static void nbgfx_encoder_set_compute_dynamic_index_buffer(long _this, byte _stage, short _handle, int _access, int _offset, int _size) {
         long __functionAddress = Functions.encoder_set_compute_dynamic_index_buffer;
         if (CHECKS) {
             check(_this);
         }
-        invokePUCV(_this, _stage, _handle, _access, __functionAddress);
+        invokePUCV(_this, _stage, _handle, _access, _offset, _size, __functionAddress);
     }
 
-    /** {@code void bgfx_encoder_set_compute_dynamic_index_buffer(bgfx_encoder_t * _this, uint8_t _stage, bgfx_dynamic_index_buffer_handle_t _handle, bgfx_access_t _access)} */
-    public static void bgfx_encoder_set_compute_dynamic_index_buffer(@NativeType("bgfx_encoder_t *") long _this, @NativeType("uint8_t") int _stage, @NativeType("bgfx_dynamic_index_buffer_handle_t") short _handle, @NativeType("bgfx_access_t") int _access) {
-        nbgfx_encoder_set_compute_dynamic_index_buffer(_this, (byte)_stage, _handle, _access);
+    /** {@code void bgfx_encoder_set_compute_dynamic_index_buffer(bgfx_encoder_t * _this, uint8_t _stage, bgfx_dynamic_index_buffer_handle_t _handle, bgfx_access_t _access, uint32_t _offset, uint32_t _size)} */
+    public static void bgfx_encoder_set_compute_dynamic_index_buffer(@NativeType("bgfx_encoder_t *") long _this, @NativeType("uint8_t") int _stage, @NativeType("bgfx_dynamic_index_buffer_handle_t") short _handle, @NativeType("bgfx_access_t") int _access, @NativeType("uint32_t") int _offset, @NativeType("uint32_t") int _size) {
+        nbgfx_encoder_set_compute_dynamic_index_buffer(_this, (byte)_stage, _handle, _access, _offset, _size);
     }
 
     // --- [ bgfx_encoder_set_compute_dynamic_vertex_buffer ] ---
 
-    /** {@code void bgfx_encoder_set_compute_dynamic_vertex_buffer(bgfx_encoder_t * _this, uint8_t _stage, bgfx_dynamic_vertex_buffer_handle_t _handle, bgfx_access_t _access)} */
-    public static void nbgfx_encoder_set_compute_dynamic_vertex_buffer(long _this, byte _stage, short _handle, int _access) {
+    /** {@code void bgfx_encoder_set_compute_dynamic_vertex_buffer(bgfx_encoder_t * _this, uint8_t _stage, bgfx_dynamic_vertex_buffer_handle_t _handle, bgfx_access_t _access, uint32_t _offset, uint32_t _size)} */
+    public static void nbgfx_encoder_set_compute_dynamic_vertex_buffer(long _this, byte _stage, short _handle, int _access, int _offset, int _size) {
         long __functionAddress = Functions.encoder_set_compute_dynamic_vertex_buffer;
         if (CHECKS) {
             check(_this);
         }
-        invokePUCV(_this, _stage, _handle, _access, __functionAddress);
+        invokePUCV(_this, _stage, _handle, _access, _offset, _size, __functionAddress);
     }
 
-    /** {@code void bgfx_encoder_set_compute_dynamic_vertex_buffer(bgfx_encoder_t * _this, uint8_t _stage, bgfx_dynamic_vertex_buffer_handle_t _handle, bgfx_access_t _access)} */
-    public static void bgfx_encoder_set_compute_dynamic_vertex_buffer(@NativeType("bgfx_encoder_t *") long _this, @NativeType("uint8_t") int _stage, @NativeType("bgfx_dynamic_vertex_buffer_handle_t") short _handle, @NativeType("bgfx_access_t") int _access) {
-        nbgfx_encoder_set_compute_dynamic_vertex_buffer(_this, (byte)_stage, _handle, _access);
+    /** {@code void bgfx_encoder_set_compute_dynamic_vertex_buffer(bgfx_encoder_t * _this, uint8_t _stage, bgfx_dynamic_vertex_buffer_handle_t _handle, bgfx_access_t _access, uint32_t _offset, uint32_t _size)} */
+    public static void bgfx_encoder_set_compute_dynamic_vertex_buffer(@NativeType("bgfx_encoder_t *") long _this, @NativeType("uint8_t") int _stage, @NativeType("bgfx_dynamic_vertex_buffer_handle_t") short _handle, @NativeType("bgfx_access_t") int _access, @NativeType("uint32_t") int _offset, @NativeType("uint32_t") int _size) {
+        nbgfx_encoder_set_compute_dynamic_vertex_buffer(_this, (byte)_stage, _handle, _access, _offset, _size);
     }
 
     // --- [ bgfx_encoder_set_compute_indirect_buffer ] ---
@@ -3761,6 +3937,14 @@ public class BGFX {
         invokeV(_fstencil, _bstencil, __functionAddress);
     }
 
+    // --- [ bgfx_set_sample_mask ] ---
+
+    /** {@code void bgfx_set_sample_mask(uint32_t _mask)} */
+    public static void bgfx_set_sample_mask(@NativeType("uint32_t") int _mask) {
+        long __functionAddress = Functions.set_sample_mask;
+        invokeV(_mask, __functionAddress);
+    }
+
     // --- [ bgfx_set_scissor ] ---
 
     /** {@code uint16_t bgfx_set_scissor(uint16_t _x, uint16_t _y, uint16_t _width, uint16_t _height)} */
@@ -3786,6 +3970,28 @@ public class BGFX {
     /** {@code void bgfx_set_scissor_cached(uint16_t _cache)} */
     public static void bgfx_set_scissor_cached(@NativeType("uint16_t") int _cache) {
         nbgfx_set_scissor_cached((short)_cache);
+    }
+
+    // --- [ bgfx_set_depth_control ] ---
+
+    /** {@code uint16_t bgfx_set_depth_control(int32_t _constant, float _slopeScale, float _clamp, bool _depthClamp)} */
+    @NativeType("uint16_t")
+    public static short bgfx_set_depth_control(@NativeType("int32_t") int _constant, float _slopeScale, float _clamp, @NativeType("bool") boolean _depthClamp) {
+        long __functionAddress = Functions.set_depth_control;
+        return invokeC(_constant, _slopeScale, _clamp, _depthClamp, __functionAddress);
+    }
+
+    // --- [ bgfx_set_depth_control_cached ] ---
+
+    /** {@code void bgfx_set_depth_control_cached(uint16_t _cache)} */
+    public static void nbgfx_set_depth_control_cached(short _cache) {
+        long __functionAddress = Functions.set_depth_control_cached;
+        invokeCV(_cache, __functionAddress);
+    }
+
+    /** {@code void bgfx_set_depth_control_cached(uint16_t _cache)} */
+    public static void bgfx_set_depth_control_cached(@NativeType("uint16_t") int _cache) {
+        nbgfx_set_depth_control_cached((short)_cache);
     }
 
     // --- [ bgfx_set_transform ] ---
@@ -3871,6 +4077,44 @@ public class BGFX {
     /** {@code void bgfx_set_uniform(bgfx_uniform_handle_t _handle, void const * _value, uint16_t _num)} */
     public static void bgfx_set_uniform(@NativeType("bgfx_uniform_handle_t") short _handle, @NativeType("void const *") DoubleBuffer _value, @NativeType("uint16_t") int _num) {
         nbgfx_set_uniform(_handle, memAddress(_value), (short)_num);
+    }
+
+    // --- [ bgfx_set_uniform_ref ] ---
+
+    /** {@code void bgfx_set_uniform_ref(bgfx_uniform_handle_t _handle, void const * _value, uint16_t _num)} */
+    public static void nbgfx_set_uniform_ref(short _handle, long _value, short _num) {
+        long __functionAddress = Functions.set_uniform_ref;
+        invokeCPCV(_handle, _value, _num, __functionAddress);
+    }
+
+    /** {@code void bgfx_set_uniform_ref(bgfx_uniform_handle_t _handle, void const * _value, uint16_t _num)} */
+    public static void bgfx_set_uniform_ref(@NativeType("bgfx_uniform_handle_t") short _handle, @NativeType("void const *") ByteBuffer _value, @NativeType("uint16_t") int _num) {
+        nbgfx_set_uniform_ref(_handle, memAddress(_value), (short)_num);
+    }
+
+    /** {@code void bgfx_set_uniform_ref(bgfx_uniform_handle_t _handle, void const * _value, uint16_t _num)} */
+    public static void bgfx_set_uniform_ref(@NativeType("bgfx_uniform_handle_t") short _handle, @NativeType("void const *") ShortBuffer _value, @NativeType("uint16_t") int _num) {
+        nbgfx_set_uniform_ref(_handle, memAddress(_value), (short)_num);
+    }
+
+    /** {@code void bgfx_set_uniform_ref(bgfx_uniform_handle_t _handle, void const * _value, uint16_t _num)} */
+    public static void bgfx_set_uniform_ref(@NativeType("bgfx_uniform_handle_t") short _handle, @NativeType("void const *") IntBuffer _value, @NativeType("uint16_t") int _num) {
+        nbgfx_set_uniform_ref(_handle, memAddress(_value), (short)_num);
+    }
+
+    /** {@code void bgfx_set_uniform_ref(bgfx_uniform_handle_t _handle, void const * _value, uint16_t _num)} */
+    public static void bgfx_set_uniform_ref(@NativeType("bgfx_uniform_handle_t") short _handle, @NativeType("void const *") LongBuffer _value, @NativeType("uint16_t") int _num) {
+        nbgfx_set_uniform_ref(_handle, memAddress(_value), (short)_num);
+    }
+
+    /** {@code void bgfx_set_uniform_ref(bgfx_uniform_handle_t _handle, void const * _value, uint16_t _num)} */
+    public static void bgfx_set_uniform_ref(@NativeType("bgfx_uniform_handle_t") short _handle, @NativeType("void const *") FloatBuffer _value, @NativeType("uint16_t") int _num) {
+        nbgfx_set_uniform_ref(_handle, memAddress(_value), (short)_num);
+    }
+
+    /** {@code void bgfx_set_uniform_ref(bgfx_uniform_handle_t _handle, void const * _value, uint16_t _num)} */
+    public static void bgfx_set_uniform_ref(@NativeType("bgfx_uniform_handle_t") short _handle, @NativeType("void const *") DoubleBuffer _value, @NativeType("uint16_t") int _num) {
+        nbgfx_set_uniform_ref(_handle, memAddress(_value), (short)_num);
     }
 
     // --- [ bgfx_set_index_buffer ] ---
@@ -4052,15 +4296,15 @@ public class BGFX {
 
     // --- [ bgfx_set_texture_view ] ---
 
-    /** {@code void bgfx_set_texture_view(uint8_t _stage, bgfx_uniform_handle_t _sampler, bgfx_texture_handle_t _handle, uint16_t _firstLayer, uint16_t _numLayers, uint8_t _firstMip, uint8_t _numMips, uint32_t _flags)} */
-    public static void nbgfx_set_texture_view(byte _stage, short _sampler, short _handle, short _firstLayer, short _numLayers, byte _firstMip, byte _numMips, int _flags) {
+    /** {@code void bgfx_set_texture_view(uint8_t _stage, bgfx_uniform_handle_t _sampler, bgfx_texture_handle_t _handle, uint16_t _firstLayer, uint16_t _numLayers, uint8_t _firstMip, uint8_t _numMips, uint32_t _flags, uint8_t _lodMin, uint8_t _lodMax)} */
+    public static void nbgfx_set_texture_view(byte _stage, short _sampler, short _handle, short _firstLayer, short _numLayers, byte _firstMip, byte _numMips, int _flags, byte _lodMin, byte _lodMax) {
         long __functionAddress = Functions.set_texture_view;
-        invokeUCCCCUUV(_stage, _sampler, _handle, _firstLayer, _numLayers, _firstMip, _numMips, _flags, __functionAddress);
+        invokeUCCCCUUUUV(_stage, _sampler, _handle, _firstLayer, _numLayers, _firstMip, _numMips, _flags, _lodMin, _lodMax, __functionAddress);
     }
 
-    /** {@code void bgfx_set_texture_view(uint8_t _stage, bgfx_uniform_handle_t _sampler, bgfx_texture_handle_t _handle, uint16_t _firstLayer, uint16_t _numLayers, uint8_t _firstMip, uint8_t _numMips, uint32_t _flags)} */
-    public static void bgfx_set_texture_view(@NativeType("uint8_t") int _stage, @NativeType("bgfx_uniform_handle_t") short _sampler, @NativeType("bgfx_texture_handle_t") short _handle, @NativeType("uint16_t") int _firstLayer, @NativeType("uint16_t") int _numLayers, @NativeType("uint8_t") int _firstMip, @NativeType("uint8_t") int _numMips, @NativeType("uint32_t") int _flags) {
-        nbgfx_set_texture_view((byte)_stage, _sampler, _handle, (short)_firstLayer, (short)_numLayers, (byte)_firstMip, (byte)_numMips, _flags);
+    /** {@code void bgfx_set_texture_view(uint8_t _stage, bgfx_uniform_handle_t _sampler, bgfx_texture_handle_t _handle, uint16_t _firstLayer, uint16_t _numLayers, uint8_t _firstMip, uint8_t _numMips, uint32_t _flags, uint8_t _lodMin, uint8_t _lodMax)} */
+    public static void bgfx_set_texture_view(@NativeType("uint8_t") int _stage, @NativeType("bgfx_uniform_handle_t") short _sampler, @NativeType("bgfx_texture_handle_t") short _handle, @NativeType("uint16_t") int _firstLayer, @NativeType("uint16_t") int _numLayers, @NativeType("uint8_t") int _firstMip, @NativeType("uint8_t") int _numMips, @NativeType("uint32_t") int _flags, @NativeType("uint8_t") int _lodMin, @NativeType("uint8_t") int _lodMax) {
+        nbgfx_set_texture_view((byte)_stage, _sampler, _handle, (short)_firstLayer, (short)_numLayers, (byte)_firstMip, (byte)_numMips, _flags, (byte)_lodMin, (byte)_lodMax);
     }
 
     // --- [ bgfx_touch ] ---
@@ -4130,54 +4374,54 @@ public class BGFX {
 
     // --- [ bgfx_set_compute_index_buffer ] ---
 
-    /** {@code void bgfx_set_compute_index_buffer(uint8_t _stage, bgfx_index_buffer_handle_t _handle, bgfx_access_t _access)} */
-    public static void nbgfx_set_compute_index_buffer(byte _stage, short _handle, int _access) {
+    /** {@code void bgfx_set_compute_index_buffer(uint8_t _stage, bgfx_index_buffer_handle_t _handle, bgfx_access_t _access, uint32_t _offset, uint32_t _size)} */
+    public static void nbgfx_set_compute_index_buffer(byte _stage, short _handle, int _access, int _offset, int _size) {
         long __functionAddress = Functions.set_compute_index_buffer;
-        invokeUCV(_stage, _handle, _access, __functionAddress);
+        invokeUCV(_stage, _handle, _access, _offset, _size, __functionAddress);
     }
 
-    /** {@code void bgfx_set_compute_index_buffer(uint8_t _stage, bgfx_index_buffer_handle_t _handle, bgfx_access_t _access)} */
-    public static void bgfx_set_compute_index_buffer(@NativeType("uint8_t") int _stage, @NativeType("bgfx_index_buffer_handle_t") short _handle, @NativeType("bgfx_access_t") int _access) {
-        nbgfx_set_compute_index_buffer((byte)_stage, _handle, _access);
+    /** {@code void bgfx_set_compute_index_buffer(uint8_t _stage, bgfx_index_buffer_handle_t _handle, bgfx_access_t _access, uint32_t _offset, uint32_t _size)} */
+    public static void bgfx_set_compute_index_buffer(@NativeType("uint8_t") int _stage, @NativeType("bgfx_index_buffer_handle_t") short _handle, @NativeType("bgfx_access_t") int _access, @NativeType("uint32_t") int _offset, @NativeType("uint32_t") int _size) {
+        nbgfx_set_compute_index_buffer((byte)_stage, _handle, _access, _offset, _size);
     }
 
     // --- [ bgfx_set_compute_vertex_buffer ] ---
 
-    /** {@code void bgfx_set_compute_vertex_buffer(uint8_t _stage, bgfx_vertex_buffer_handle_t _handle, bgfx_access_t _access)} */
-    public static void nbgfx_set_compute_vertex_buffer(byte _stage, short _handle, int _access) {
+    /** {@code void bgfx_set_compute_vertex_buffer(uint8_t _stage, bgfx_vertex_buffer_handle_t _handle, bgfx_access_t _access, uint32_t _offset, uint32_t _size)} */
+    public static void nbgfx_set_compute_vertex_buffer(byte _stage, short _handle, int _access, int _offset, int _size) {
         long __functionAddress = Functions.set_compute_vertex_buffer;
-        invokeUCV(_stage, _handle, _access, __functionAddress);
+        invokeUCV(_stage, _handle, _access, _offset, _size, __functionAddress);
     }
 
-    /** {@code void bgfx_set_compute_vertex_buffer(uint8_t _stage, bgfx_vertex_buffer_handle_t _handle, bgfx_access_t _access)} */
-    public static void bgfx_set_compute_vertex_buffer(@NativeType("uint8_t") int _stage, @NativeType("bgfx_vertex_buffer_handle_t") short _handle, @NativeType("bgfx_access_t") int _access) {
-        nbgfx_set_compute_vertex_buffer((byte)_stage, _handle, _access);
+    /** {@code void bgfx_set_compute_vertex_buffer(uint8_t _stage, bgfx_vertex_buffer_handle_t _handle, bgfx_access_t _access, uint32_t _offset, uint32_t _size)} */
+    public static void bgfx_set_compute_vertex_buffer(@NativeType("uint8_t") int _stage, @NativeType("bgfx_vertex_buffer_handle_t") short _handle, @NativeType("bgfx_access_t") int _access, @NativeType("uint32_t") int _offset, @NativeType("uint32_t") int _size) {
+        nbgfx_set_compute_vertex_buffer((byte)_stage, _handle, _access, _offset, _size);
     }
 
     // --- [ bgfx_set_compute_dynamic_index_buffer ] ---
 
-    /** {@code void bgfx_set_compute_dynamic_index_buffer(uint8_t _stage, bgfx_dynamic_index_buffer_handle_t _handle, bgfx_access_t _access)} */
-    public static void nbgfx_set_compute_dynamic_index_buffer(byte _stage, short _handle, int _access) {
+    /** {@code void bgfx_set_compute_dynamic_index_buffer(uint8_t _stage, bgfx_dynamic_index_buffer_handle_t _handle, bgfx_access_t _access, uint32_t _offset, uint32_t _size)} */
+    public static void nbgfx_set_compute_dynamic_index_buffer(byte _stage, short _handle, int _access, int _offset, int _size) {
         long __functionAddress = Functions.set_compute_dynamic_index_buffer;
-        invokeUCV(_stage, _handle, _access, __functionAddress);
+        invokeUCV(_stage, _handle, _access, _offset, _size, __functionAddress);
     }
 
-    /** {@code void bgfx_set_compute_dynamic_index_buffer(uint8_t _stage, bgfx_dynamic_index_buffer_handle_t _handle, bgfx_access_t _access)} */
-    public static void bgfx_set_compute_dynamic_index_buffer(@NativeType("uint8_t") int _stage, @NativeType("bgfx_dynamic_index_buffer_handle_t") short _handle, @NativeType("bgfx_access_t") int _access) {
-        nbgfx_set_compute_dynamic_index_buffer((byte)_stage, _handle, _access);
+    /** {@code void bgfx_set_compute_dynamic_index_buffer(uint8_t _stage, bgfx_dynamic_index_buffer_handle_t _handle, bgfx_access_t _access, uint32_t _offset, uint32_t _size)} */
+    public static void bgfx_set_compute_dynamic_index_buffer(@NativeType("uint8_t") int _stage, @NativeType("bgfx_dynamic_index_buffer_handle_t") short _handle, @NativeType("bgfx_access_t") int _access, @NativeType("uint32_t") int _offset, @NativeType("uint32_t") int _size) {
+        nbgfx_set_compute_dynamic_index_buffer((byte)_stage, _handle, _access, _offset, _size);
     }
 
     // --- [ bgfx_set_compute_dynamic_vertex_buffer ] ---
 
-    /** {@code void bgfx_set_compute_dynamic_vertex_buffer(uint8_t _stage, bgfx_dynamic_vertex_buffer_handle_t _handle, bgfx_access_t _access)} */
-    public static void nbgfx_set_compute_dynamic_vertex_buffer(byte _stage, short _handle, int _access) {
+    /** {@code void bgfx_set_compute_dynamic_vertex_buffer(uint8_t _stage, bgfx_dynamic_vertex_buffer_handle_t _handle, bgfx_access_t _access, uint32_t _offset, uint32_t _size)} */
+    public static void nbgfx_set_compute_dynamic_vertex_buffer(byte _stage, short _handle, int _access, int _offset, int _size) {
         long __functionAddress = Functions.set_compute_dynamic_vertex_buffer;
-        invokeUCV(_stage, _handle, _access, __functionAddress);
+        invokeUCV(_stage, _handle, _access, _offset, _size, __functionAddress);
     }
 
-    /** {@code void bgfx_set_compute_dynamic_vertex_buffer(uint8_t _stage, bgfx_dynamic_vertex_buffer_handle_t _handle, bgfx_access_t _access)} */
-    public static void bgfx_set_compute_dynamic_vertex_buffer(@NativeType("uint8_t") int _stage, @NativeType("bgfx_dynamic_vertex_buffer_handle_t") short _handle, @NativeType("bgfx_access_t") int _access) {
-        nbgfx_set_compute_dynamic_vertex_buffer((byte)_stage, _handle, _access);
+    /** {@code void bgfx_set_compute_dynamic_vertex_buffer(uint8_t _stage, bgfx_dynamic_vertex_buffer_handle_t _handle, bgfx_access_t _access, uint32_t _offset, uint32_t _size)} */
+    public static void bgfx_set_compute_dynamic_vertex_buffer(@NativeType("uint8_t") int _stage, @NativeType("bgfx_dynamic_vertex_buffer_handle_t") short _handle, @NativeType("bgfx_access_t") int _access, @NativeType("uint32_t") int _offset, @NativeType("uint32_t") int _size) {
+        nbgfx_set_compute_dynamic_vertex_buffer((byte)_stage, _handle, _access, _offset, _size);
     }
 
     // --- [ bgfx_set_compute_indirect_buffer ] ---
@@ -4738,6 +4982,51 @@ public class BGFX {
         invokePCPCV(_this, _handle, _value, (short)_num, __functionAddress);
     }
 
+    /** {@code void bgfx_encoder_set_uniform_ref(bgfx_encoder_t * _this, bgfx_uniform_handle_t _handle, void const * _value, uint16_t _num)} */
+    public static void bgfx_encoder_set_uniform_ref(@NativeType("bgfx_encoder_t *") long _this, @NativeType("bgfx_uniform_handle_t") short _handle, @NativeType("void const *") short[] _value, @NativeType("uint16_t") int _num) {
+        long __functionAddress = Functions.encoder_set_uniform_ref;
+        if (CHECKS) {
+            check(_this);
+        }
+        invokePCPCV(_this, _handle, _value, (short)_num, __functionAddress);
+    }
+
+    /** {@code void bgfx_encoder_set_uniform_ref(bgfx_encoder_t * _this, bgfx_uniform_handle_t _handle, void const * _value, uint16_t _num)} */
+    public static void bgfx_encoder_set_uniform_ref(@NativeType("bgfx_encoder_t *") long _this, @NativeType("bgfx_uniform_handle_t") short _handle, @NativeType("void const *") int[] _value, @NativeType("uint16_t") int _num) {
+        long __functionAddress = Functions.encoder_set_uniform_ref;
+        if (CHECKS) {
+            check(_this);
+        }
+        invokePCPCV(_this, _handle, _value, (short)_num, __functionAddress);
+    }
+
+    /** {@code void bgfx_encoder_set_uniform_ref(bgfx_encoder_t * _this, bgfx_uniform_handle_t _handle, void const * _value, uint16_t _num)} */
+    public static void bgfx_encoder_set_uniform_ref(@NativeType("bgfx_encoder_t *") long _this, @NativeType("bgfx_uniform_handle_t") short _handle, @NativeType("void const *") long[] _value, @NativeType("uint16_t") int _num) {
+        long __functionAddress = Functions.encoder_set_uniform_ref;
+        if (CHECKS) {
+            check(_this);
+        }
+        invokePCPCV(_this, _handle, _value, (short)_num, __functionAddress);
+    }
+
+    /** {@code void bgfx_encoder_set_uniform_ref(bgfx_encoder_t * _this, bgfx_uniform_handle_t _handle, void const * _value, uint16_t _num)} */
+    public static void bgfx_encoder_set_uniform_ref(@NativeType("bgfx_encoder_t *") long _this, @NativeType("bgfx_uniform_handle_t") short _handle, @NativeType("void const *") float[] _value, @NativeType("uint16_t") int _num) {
+        long __functionAddress = Functions.encoder_set_uniform_ref;
+        if (CHECKS) {
+            check(_this);
+        }
+        invokePCPCV(_this, _handle, _value, (short)_num, __functionAddress);
+    }
+
+    /** {@code void bgfx_encoder_set_uniform_ref(bgfx_encoder_t * _this, bgfx_uniform_handle_t _handle, void const * _value, uint16_t _num)} */
+    public static void bgfx_encoder_set_uniform_ref(@NativeType("bgfx_encoder_t *") long _this, @NativeType("bgfx_uniform_handle_t") short _handle, @NativeType("void const *") double[] _value, @NativeType("uint16_t") int _num) {
+        long __functionAddress = Functions.encoder_set_uniform_ref;
+        if (CHECKS) {
+            check(_this);
+        }
+        invokePCPCV(_this, _handle, _value, (short)_num, __functionAddress);
+    }
+
     /** {@code void bgfx_set_view_uniform(bgfx_view_id_t _id, bgfx_uniform_handle_t _handle, void const * _value, uint16_t _num)} */
     public static void bgfx_set_view_uniform(@NativeType("bgfx_view_id_t") int _id, @NativeType("bgfx_uniform_handle_t") short _handle, @NativeType("void const *") short[] _value, @NativeType("uint16_t") int _num) {
         long __functionAddress = Functions.set_view_uniform;
@@ -4832,6 +5121,36 @@ public class BGFX {
     /** {@code void bgfx_set_uniform(bgfx_uniform_handle_t _handle, void const * _value, uint16_t _num)} */
     public static void bgfx_set_uniform(@NativeType("bgfx_uniform_handle_t") short _handle, @NativeType("void const *") double[] _value, @NativeType("uint16_t") int _num) {
         long __functionAddress = Functions.set_uniform;
+        invokeCPCV(_handle, _value, (short)_num, __functionAddress);
+    }
+
+    /** {@code void bgfx_set_uniform_ref(bgfx_uniform_handle_t _handle, void const * _value, uint16_t _num)} */
+    public static void bgfx_set_uniform_ref(@NativeType("bgfx_uniform_handle_t") short _handle, @NativeType("void const *") short[] _value, @NativeType("uint16_t") int _num) {
+        long __functionAddress = Functions.set_uniform_ref;
+        invokeCPCV(_handle, _value, (short)_num, __functionAddress);
+    }
+
+    /** {@code void bgfx_set_uniform_ref(bgfx_uniform_handle_t _handle, void const * _value, uint16_t _num)} */
+    public static void bgfx_set_uniform_ref(@NativeType("bgfx_uniform_handle_t") short _handle, @NativeType("void const *") int[] _value, @NativeType("uint16_t") int _num) {
+        long __functionAddress = Functions.set_uniform_ref;
+        invokeCPCV(_handle, _value, (short)_num, __functionAddress);
+    }
+
+    /** {@code void bgfx_set_uniform_ref(bgfx_uniform_handle_t _handle, void const * _value, uint16_t _num)} */
+    public static void bgfx_set_uniform_ref(@NativeType("bgfx_uniform_handle_t") short _handle, @NativeType("void const *") long[] _value, @NativeType("uint16_t") int _num) {
+        long __functionAddress = Functions.set_uniform_ref;
+        invokeCPCV(_handle, _value, (short)_num, __functionAddress);
+    }
+
+    /** {@code void bgfx_set_uniform_ref(bgfx_uniform_handle_t _handle, void const * _value, uint16_t _num)} */
+    public static void bgfx_set_uniform_ref(@NativeType("bgfx_uniform_handle_t") short _handle, @NativeType("void const *") float[] _value, @NativeType("uint16_t") int _num) {
+        long __functionAddress = Functions.set_uniform_ref;
+        invokeCPCV(_handle, _value, (short)_num, __functionAddress);
+    }
+
+    /** {@code void bgfx_set_uniform_ref(bgfx_uniform_handle_t _handle, void const * _value, uint16_t _num)} */
+    public static void bgfx_set_uniform_ref(@NativeType("bgfx_uniform_handle_t") short _handle, @NativeType("void const *") double[] _value, @NativeType("uint16_t") int _num) {
+        long __functionAddress = Functions.set_uniform_ref;
         invokeCPCV(_handle, _value, (short)_num, __functionAddress);
     }
 

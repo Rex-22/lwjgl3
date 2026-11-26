@@ -18,6 +18,7 @@ import static org.lwjgl.system.MemoryUtil.*;
  * struct bgfx_internal_data_t {
  *     {@link BGFXCaps bgfx_caps_t} * caps;
  *     void * context;
+ *     void * queue;
  * }</code></pre>
  */
 @NativeType("struct bgfx_internal_data_t")
@@ -32,10 +33,12 @@ public class BGFXInternalData extends Struct<BGFXInternalData> {
     /** The struct member offsets. */
     public static final int
         CAPS,
-        CONTEXT;
+        CONTEXT,
+        QUEUE;
 
     static {
         Layout layout = __struct(
+            __member(POINTER_SIZE),
             __member(POINTER_SIZE),
             __member(POINTER_SIZE)
         );
@@ -45,6 +48,7 @@ public class BGFXInternalData extends Struct<BGFXInternalData> {
 
         CAPS = layout.offsetof(0);
         CONTEXT = layout.offsetof(1);
+        QUEUE = layout.offsetof(2);
     }
 
     protected BGFXInternalData(long address, @Nullable ByteBuffer container) {
@@ -75,6 +79,9 @@ public class BGFXInternalData extends Struct<BGFXInternalData> {
     /** @return the value of the {@code context} field. */
     @NativeType("void *")
     public long context() { return ncontext(address()); }
+    /** @return the value of the {@code queue} field. */
+    @NativeType("void *")
+    public long queue() { return nqueue(address()); }
 
     // -----------------------------------
 
@@ -94,5 +101,7 @@ public class BGFXInternalData extends Struct<BGFXInternalData> {
     public static BGFXCaps ncaps(long struct) { return BGFXCaps.create(memGetAddress(struct + BGFXInternalData.CAPS)); }
     /** Unsafe version of {@link #context}. */
     public static long ncontext(long struct) { return memGetAddress(struct + BGFXInternalData.CONTEXT); }
+    /** Unsafe version of {@link #queue}. */
+    public static long nqueue(long struct) { return memGetAddress(struct + BGFXInternalData.QUEUE); }
 
 }

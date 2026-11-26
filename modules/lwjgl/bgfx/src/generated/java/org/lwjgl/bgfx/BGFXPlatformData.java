@@ -18,12 +18,8 @@ import static org.lwjgl.system.MemoryStack.*;
 /**
  * <pre>{@code
  * struct bgfx_platform_data_t {
- *     void * ndt;
- *     void * nwh;
  *     void * context;
  *     void * queue;
- *     void * backBuffer;
- *     void * backBufferDS;
  *     bgfx_native_window_handle_type_t type;
  * }}</pre>
  */
@@ -38,20 +34,12 @@ public class BGFXPlatformData extends Struct<BGFXPlatformData> implements Native
 
     /** The struct member offsets. */
     public static final int
-        NDT,
-        NWH,
         CONTEXT,
         QUEUE,
-        BACKBUFFER,
-        BACKBUFFERDS,
         TYPE;
 
     static {
         Layout layout = __struct(
-            __member(POINTER_SIZE),
-            __member(POINTER_SIZE),
-            __member(POINTER_SIZE),
-            __member(POINTER_SIZE),
             __member(POINTER_SIZE),
             __member(POINTER_SIZE),
             __member(4)
@@ -60,13 +48,9 @@ public class BGFXPlatformData extends Struct<BGFXPlatformData> implements Native
         SIZEOF = layout.getSize();
         ALIGNOF = layout.getAlignment();
 
-        NDT = layout.offsetof(0);
-        NWH = layout.offsetof(1);
-        CONTEXT = layout.offsetof(2);
-        QUEUE = layout.offsetof(3);
-        BACKBUFFER = layout.offsetof(4);
-        BACKBUFFERDS = layout.offsetof(5);
-        TYPE = layout.offsetof(6);
+        CONTEXT = layout.offsetof(0);
+        QUEUE = layout.offsetof(1);
+        TYPE = layout.offsetof(2);
     }
 
     protected BGFXPlatformData(long address, @Nullable ByteBuffer container) {
@@ -91,59 +75,31 @@ public class BGFXPlatformData extends Struct<BGFXPlatformData> implements Native
     @Override
     public int sizeof() { return SIZEOF; }
 
-    /** @return the value of the {@code ndt} field. */
-    @NativeType("void *")
-    public long ndt() { return nndt(address()); }
-    /** @return the value of the {@code nwh} field. */
-    @NativeType("void *")
-    public long nwh() { return nnwh(address()); }
     /** @return the value of the {@code context} field. */
     @NativeType("void *")
     public long context() { return ncontext(address()); }
     /** @return the value of the {@code queue} field. */
     @NativeType("void *")
     public long queue() { return nqueue(address()); }
-    /** @return the value of the {@code backBuffer} field. */
-    @NativeType("void *")
-    public long backBuffer() { return nbackBuffer(address()); }
-    /** @return the value of the {@code backBufferDS} field. */
-    @NativeType("void *")
-    public long backBufferDS() { return nbackBufferDS(address()); }
     /** @return the value of the {@code type} field. */
     @NativeType("bgfx_native_window_handle_type_t")
     public int type() { return ntype(address()); }
 
-    /** Sets the specified value to the {@code ndt} field. */
-    public BGFXPlatformData ndt(@NativeType("void *") long value) { nndt(address(), value); return this; }
-    /** Sets the specified value to the {@code nwh} field. */
-    public BGFXPlatformData nwh(@NativeType("void *") long value) { nnwh(address(), value); return this; }
     /** Sets the specified value to the {@code context} field. */
     public BGFXPlatformData context(@NativeType("void *") long value) { ncontext(address(), value); return this; }
     /** Sets the specified value to the {@code queue} field. */
     public BGFXPlatformData queue(@NativeType("void *") long value) { nqueue(address(), value); return this; }
-    /** Sets the specified value to the {@code backBuffer} field. */
-    public BGFXPlatformData backBuffer(@NativeType("void *") long value) { nbackBuffer(address(), value); return this; }
-    /** Sets the specified value to the {@code backBufferDS} field. */
-    public BGFXPlatformData backBufferDS(@NativeType("void *") long value) { nbackBufferDS(address(), value); return this; }
     /** Sets the specified value to the {@code type} field. */
     public BGFXPlatformData type(@NativeType("bgfx_native_window_handle_type_t") int value) { ntype(address(), value); return this; }
 
     /** Initializes this struct with the specified values. */
     public BGFXPlatformData set(
-        long ndt,
-        long nwh,
         long context,
         long queue,
-        long backBuffer,
-        long backBufferDS,
         int type
     ) {
-        ndt(ndt);
-        nwh(nwh);
         context(context);
         queue(queue);
-        backBuffer(backBuffer);
-        backBufferDS(backBufferDS);
         type(type);
 
         return this;
@@ -209,33 +165,17 @@ public class BGFXPlatformData extends Struct<BGFXPlatformData> implements Native
 
     // -----------------------------------
 
-    /** Unsafe version of {@link #ndt}. */
-    public static long nndt(long struct) { return memGetAddress(struct + BGFXPlatformData.NDT); }
-    /** Unsafe version of {@link #nwh}. */
-    public static long nnwh(long struct) { return memGetAddress(struct + BGFXPlatformData.NWH); }
     /** Unsafe version of {@link #context}. */
     public static long ncontext(long struct) { return memGetAddress(struct + BGFXPlatformData.CONTEXT); }
     /** Unsafe version of {@link #queue}. */
     public static long nqueue(long struct) { return memGetAddress(struct + BGFXPlatformData.QUEUE); }
-    /** Unsafe version of {@link #backBuffer}. */
-    public static long nbackBuffer(long struct) { return memGetAddress(struct + BGFXPlatformData.BACKBUFFER); }
-    /** Unsafe version of {@link #backBufferDS}. */
-    public static long nbackBufferDS(long struct) { return memGetAddress(struct + BGFXPlatformData.BACKBUFFERDS); }
     /** Unsafe version of {@link #type}. */
     public static int ntype(long struct) { return memGetInt(struct + BGFXPlatformData.TYPE); }
 
-    /** Unsafe version of {@link #ndt(long) ndt}. */
-    public static void nndt(long struct, long value) { memPutAddress(struct + BGFXPlatformData.NDT, value); }
-    /** Unsafe version of {@link #nwh(long) nwh}. */
-    public static void nnwh(long struct, long value) { memPutAddress(struct + BGFXPlatformData.NWH, value); }
     /** Unsafe version of {@link #context(long) context}. */
     public static void ncontext(long struct, long value) { memPutAddress(struct + BGFXPlatformData.CONTEXT, value); }
     /** Unsafe version of {@link #queue(long) queue}. */
     public static void nqueue(long struct, long value) { memPutAddress(struct + BGFXPlatformData.QUEUE, value); }
-    /** Unsafe version of {@link #backBuffer(long) backBuffer}. */
-    public static void nbackBuffer(long struct, long value) { memPutAddress(struct + BGFXPlatformData.BACKBUFFER, value); }
-    /** Unsafe version of {@link #backBufferDS(long) backBufferDS}. */
-    public static void nbackBufferDS(long struct, long value) { memPutAddress(struct + BGFXPlatformData.BACKBUFFERDS, value); }
     /** Unsafe version of {@link #type(int) type}. */
     public static void ntype(long struct, int value) { memPutInt(struct + BGFXPlatformData.TYPE, value); }
 

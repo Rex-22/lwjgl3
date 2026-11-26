@@ -23,7 +23,7 @@ import static org.lwjgl.system.MemoryStack.*;
  *     uint16_t mip;
  *     uint16_t layer;
  *     uint16_t numLayers;
- *     uint8_t resolve;
+ *     uint8_t flags;
  * }}</pre>
  */
 @NativeType("struct bgfx_attachment_t")
@@ -42,7 +42,7 @@ public class BGFXAttachment extends Struct<BGFXAttachment> implements NativeReso
         MIP,
         LAYER,
         NUMLAYERS,
-        RESOLVE;
+        FLAGS;
 
     static {
         Layout layout = __struct(
@@ -62,7 +62,7 @@ public class BGFXAttachment extends Struct<BGFXAttachment> implements NativeReso
         MIP = layout.offsetof(2);
         LAYER = layout.offsetof(3);
         NUMLAYERS = layout.offsetof(4);
-        RESOLVE = layout.offsetof(5);
+        FLAGS = layout.offsetof(5);
     }
 
     protected BGFXAttachment(long address, @Nullable ByteBuffer container) {
@@ -102,9 +102,9 @@ public class BGFXAttachment extends Struct<BGFXAttachment> implements NativeReso
     /** @return the value of the {@code numLayers} field. */
     @NativeType("uint16_t")
     public short numLayers() { return nnumLayers(address()); }
-    /** @return the value of the {@code resolve} field. */
+    /** @return the value of the {@code flags} field. */
     @NativeType("uint8_t")
-    public byte resolve() { return nresolve(address()); }
+    public byte flags() { return nflags(address()); }
 
     /** Sets the specified value to the {@code access} field. */
     public BGFXAttachment access(@NativeType("bgfx_access_t") int value) { naccess(address(), value); return this; }
@@ -116,8 +116,8 @@ public class BGFXAttachment extends Struct<BGFXAttachment> implements NativeReso
     public BGFXAttachment layer(@NativeType("uint16_t") short value) { nlayer(address(), value); return this; }
     /** Sets the specified value to the {@code numLayers} field. */
     public BGFXAttachment numLayers(@NativeType("uint16_t") short value) { nnumLayers(address(), value); return this; }
-    /** Sets the specified value to the {@code resolve} field. */
-    public BGFXAttachment resolve(@NativeType("uint8_t") byte value) { nresolve(address(), value); return this; }
+    /** Sets the specified value to the {@code flags} field. */
+    public BGFXAttachment flags(@NativeType("uint8_t") byte value) { nflags(address(), value); return this; }
 
     /** Initializes this struct with the specified values. */
     public BGFXAttachment set(
@@ -126,14 +126,14 @@ public class BGFXAttachment extends Struct<BGFXAttachment> implements NativeReso
         short mip,
         short layer,
         short numLayers,
-        byte resolve
+        byte flags
     ) {
         access(access);
         handle(handle);
         mip(mip);
         layer(layer);
         numLayers(numLayers);
-        resolve(resolve);
+        flags(flags);
 
         return this;
     }
@@ -271,8 +271,8 @@ public class BGFXAttachment extends Struct<BGFXAttachment> implements NativeReso
     public static short nlayer(long struct) { return memGetShort(struct + BGFXAttachment.LAYER); }
     /** Unsafe version of {@link #numLayers}. */
     public static short nnumLayers(long struct) { return memGetShort(struct + BGFXAttachment.NUMLAYERS); }
-    /** Unsafe version of {@link #resolve}. */
-    public static byte nresolve(long struct) { return memGetByte(struct + BGFXAttachment.RESOLVE); }
+    /** Unsafe version of {@link #flags}. */
+    public static byte nflags(long struct) { return memGetByte(struct + BGFXAttachment.FLAGS); }
 
     /** Unsafe version of {@link #access(int) access}. */
     public static void naccess(long struct, int value) { memPutInt(struct + BGFXAttachment.ACCESS, value); }
@@ -284,8 +284,8 @@ public class BGFXAttachment extends Struct<BGFXAttachment> implements NativeReso
     public static void nlayer(long struct, short value) { memPutShort(struct + BGFXAttachment.LAYER, value); }
     /** Unsafe version of {@link #numLayers(short) numLayers}. */
     public static void nnumLayers(long struct, short value) { memPutShort(struct + BGFXAttachment.NUMLAYERS, value); }
-    /** Unsafe version of {@link #resolve(byte) resolve}. */
-    public static void nresolve(long struct, byte value) { memPutByte(struct + BGFXAttachment.RESOLVE, value); }
+    /** Unsafe version of {@link #flags(byte) flags}. */
+    public static void nflags(long struct, byte value) { memPutByte(struct + BGFXAttachment.FLAGS, value); }
 
     // -----------------------------------
 
@@ -345,9 +345,9 @@ public class BGFXAttachment extends Struct<BGFXAttachment> implements NativeReso
         /** @return the value of the {@code numLayers} field. */
         @NativeType("uint16_t")
         public short numLayers() { return BGFXAttachment.nnumLayers(address()); }
-        /** @return the value of the {@code resolve} field. */
+        /** @return the value of the {@code flags} field. */
         @NativeType("uint8_t")
-        public byte resolve() { return BGFXAttachment.nresolve(address()); }
+        public byte flags() { return BGFXAttachment.nflags(address()); }
 
         /** Sets the specified value to the {@code access} field. */
         public BGFXAttachment.Buffer access(@NativeType("bgfx_access_t") int value) { BGFXAttachment.naccess(address(), value); return this; }
@@ -359,8 +359,8 @@ public class BGFXAttachment extends Struct<BGFXAttachment> implements NativeReso
         public BGFXAttachment.Buffer layer(@NativeType("uint16_t") short value) { BGFXAttachment.nlayer(address(), value); return this; }
         /** Sets the specified value to the {@code numLayers} field. */
         public BGFXAttachment.Buffer numLayers(@NativeType("uint16_t") short value) { BGFXAttachment.nnumLayers(address(), value); return this; }
-        /** Sets the specified value to the {@code resolve} field. */
-        public BGFXAttachment.Buffer resolve(@NativeType("uint8_t") byte value) { BGFXAttachment.nresolve(address(), value); return this; }
+        /** Sets the specified value to the {@code flags} field. */
+        public BGFXAttachment.Buffer flags(@NativeType("uint8_t") byte value) { BGFXAttachment.nflags(address(), value); return this; }
 
     }
 

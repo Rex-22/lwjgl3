@@ -40,9 +40,10 @@ import static org.lwjgl.system.MemoryUtil.*;
  *     uint32_t maxOcclusionQueries;
  *     uint32_t maxEncoders;
  *     uint32_t minResourceCbSize;
- *     uint32_t maxTransientVbSize;
- *     uint32_t maxTransientIbSize;
+ *     uint32_t minTransientVbSize;
+ *     uint32_t minTransientIbSize;
  *     uint32_t minUniformBufferSize;
+ *     uint32_t minUniformCacheSize;
  *     uint32_t blitRowPitchAlign;
  *     uint32_t blitOffsetAlign;
  * }}</pre>
@@ -82,14 +83,16 @@ public class BGFXCapsLimits extends Struct<BGFXCapsLimits> {
         MAXOCCLUSIONQUERIES,
         MAXENCODERS,
         MINRESOURCECBSIZE,
-        MAXTRANSIENTVBSIZE,
-        MAXTRANSIENTIBSIZE,
+        MINTRANSIENTVBSIZE,
+        MINTRANSIENTIBSIZE,
         MINUNIFORMBUFFERSIZE,
+        MINUNIFORMCACHESIZE,
         BLITROWPITCHALIGN,
         BLITOFFSETALIGN;
 
     static {
         Layout layout = __struct(
+            __member(4),
             __member(4),
             __member(4),
             __member(4),
@@ -148,11 +151,12 @@ public class BGFXCapsLimits extends Struct<BGFXCapsLimits> {
         MAXOCCLUSIONQUERIES = layout.offsetof(21);
         MAXENCODERS = layout.offsetof(22);
         MINRESOURCECBSIZE = layout.offsetof(23);
-        MAXTRANSIENTVBSIZE = layout.offsetof(24);
-        MAXTRANSIENTIBSIZE = layout.offsetof(25);
+        MINTRANSIENTVBSIZE = layout.offsetof(24);
+        MINTRANSIENTIBSIZE = layout.offsetof(25);
         MINUNIFORMBUFFERSIZE = layout.offsetof(26);
-        BLITROWPITCHALIGN = layout.offsetof(27);
-        BLITOFFSETALIGN = layout.offsetof(28);
+        MINUNIFORMCACHESIZE = layout.offsetof(27);
+        BLITROWPITCHALIGN = layout.offsetof(28);
+        BLITOFFSETALIGN = layout.offsetof(29);
     }
 
     protected BGFXCapsLimits(long address, @Nullable ByteBuffer container) {
@@ -249,15 +253,18 @@ public class BGFXCapsLimits extends Struct<BGFXCapsLimits> {
     /** @return the value of the {@code minResourceCbSize} field. */
     @NativeType("uint32_t")
     public int minResourceCbSize() { return nminResourceCbSize(address()); }
-    /** @return the value of the {@code maxTransientVbSize} field. */
+    /** @return the value of the {@code minTransientVbSize} field. */
     @NativeType("uint32_t")
-    public int maxTransientVbSize() { return nmaxTransientVbSize(address()); }
-    /** @return the value of the {@code maxTransientIbSize} field. */
+    public int minTransientVbSize() { return nminTransientVbSize(address()); }
+    /** @return the value of the {@code minTransientIbSize} field. */
     @NativeType("uint32_t")
-    public int maxTransientIbSize() { return nmaxTransientIbSize(address()); }
+    public int minTransientIbSize() { return nminTransientIbSize(address()); }
     /** @return the value of the {@code minUniformBufferSize} field. */
     @NativeType("uint32_t")
     public int minUniformBufferSize() { return nminUniformBufferSize(address()); }
+    /** @return the value of the {@code minUniformCacheSize} field. */
+    @NativeType("uint32_t")
+    public int minUniformCacheSize() { return nminUniformCacheSize(address()); }
     /** @return the value of the {@code blitRowPitchAlign} field. */
     @NativeType("uint32_t")
     public int blitRowPitchAlign() { return nblitRowPitchAlign(address()); }
@@ -342,12 +349,14 @@ public class BGFXCapsLimits extends Struct<BGFXCapsLimits> {
     public static int nmaxEncoders(long struct) { return memGetInt(struct + BGFXCapsLimits.MAXENCODERS); }
     /** Unsafe version of {@link #minResourceCbSize}. */
     public static int nminResourceCbSize(long struct) { return memGetInt(struct + BGFXCapsLimits.MINRESOURCECBSIZE); }
-    /** Unsafe version of {@link #maxTransientVbSize}. */
-    public static int nmaxTransientVbSize(long struct) { return memGetInt(struct + BGFXCapsLimits.MAXTRANSIENTVBSIZE); }
-    /** Unsafe version of {@link #maxTransientIbSize}. */
-    public static int nmaxTransientIbSize(long struct) { return memGetInt(struct + BGFXCapsLimits.MAXTRANSIENTIBSIZE); }
+    /** Unsafe version of {@link #minTransientVbSize}. */
+    public static int nminTransientVbSize(long struct) { return memGetInt(struct + BGFXCapsLimits.MINTRANSIENTVBSIZE); }
+    /** Unsafe version of {@link #minTransientIbSize}. */
+    public static int nminTransientIbSize(long struct) { return memGetInt(struct + BGFXCapsLimits.MINTRANSIENTIBSIZE); }
     /** Unsafe version of {@link #minUniformBufferSize}. */
     public static int nminUniformBufferSize(long struct) { return memGetInt(struct + BGFXCapsLimits.MINUNIFORMBUFFERSIZE); }
+    /** Unsafe version of {@link #minUniformCacheSize}. */
+    public static int nminUniformCacheSize(long struct) { return memGetInt(struct + BGFXCapsLimits.MINUNIFORMCACHESIZE); }
     /** Unsafe version of {@link #blitRowPitchAlign}. */
     public static int nblitRowPitchAlign(long struct) { return memGetInt(struct + BGFXCapsLimits.BLITROWPITCHALIGN); }
     /** Unsafe version of {@link #blitOffsetAlign}. */
@@ -468,15 +477,18 @@ public class BGFXCapsLimits extends Struct<BGFXCapsLimits> {
         /** @return the value of the {@code minResourceCbSize} field. */
         @NativeType("uint32_t")
         public int minResourceCbSize() { return BGFXCapsLimits.nminResourceCbSize(address()); }
-        /** @return the value of the {@code maxTransientVbSize} field. */
+        /** @return the value of the {@code minTransientVbSize} field. */
         @NativeType("uint32_t")
-        public int maxTransientVbSize() { return BGFXCapsLimits.nmaxTransientVbSize(address()); }
-        /** @return the value of the {@code maxTransientIbSize} field. */
+        public int minTransientVbSize() { return BGFXCapsLimits.nminTransientVbSize(address()); }
+        /** @return the value of the {@code minTransientIbSize} field. */
         @NativeType("uint32_t")
-        public int maxTransientIbSize() { return BGFXCapsLimits.nmaxTransientIbSize(address()); }
+        public int minTransientIbSize() { return BGFXCapsLimits.nminTransientIbSize(address()); }
         /** @return the value of the {@code minUniformBufferSize} field. */
         @NativeType("uint32_t")
         public int minUniformBufferSize() { return BGFXCapsLimits.nminUniformBufferSize(address()); }
+        /** @return the value of the {@code minUniformCacheSize} field. */
+        @NativeType("uint32_t")
+        public int minUniformCacheSize() { return BGFXCapsLimits.nminUniformCacheSize(address()); }
         /** @return the value of the {@code blitRowPitchAlign} field. */
         @NativeType("uint32_t")
         public int blitRowPitchAlign() { return BGFXCapsLimits.nblitRowPitchAlign(address()); }

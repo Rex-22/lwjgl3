@@ -1,0 +1,219 @@
+# Builds LWJGL core and bgfx for Tillage and publishes them as a file-based Maven repository (tillage/README.md).
+name: Tillage LWJGL
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - tillage/**
+
+permissions:
+  contents: read
+
+env:
+  # Upstream LWJGL release this branch starts from; every other module comes from Maven Central at this version.
+  LWJGL_BASE: 3.4.3
+  # Published version: <base>.<bgfx API version>. Bump together with BGFX_CMAKE_TAG.
+  TILLAGE_VERSION: 3.4.3.172
+  # bgfx.cmake release whose bgfx commit libbgfx is built from. Tillage pins the same release's shaderc.
+  BGFX_CMAKE_TAG: v1.172.9657-621
+
+jobs:
+  java:
+    name: Java
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@v4
+        with:
+          distribution: zulu
+          java-version: 25
+      - name: Generate bindings and compile
+        run: ant -emacs compile-templates generate compile
+      - name: Check generated sources are committed
+        run: git diff --exit-code -- modules
+      - uses: actions/upload-artifact@v4
+        with:
+          name: classes
+          path: |
+            bin/classes/lwjgl/core
+            bin/classes/lwjgl/bgfx
+
+  macos:
+    name: macOS ${{ matrix.arch }}
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x64
+            runner: macos-26-intel
+            classifier: natives-macos
+            target: '10.15'
+          - arch: arm64
+            runner: macos-26
+            classifier: natives-macos-arm64
+            target: '11.0'
+    env:
+      LWJGL_BUILD_ARCH: ${{ matrix.arch }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@v4
+        with:
+          distribution: zulu
+          java-version: 25
+      - name: Build liblwjgl
+        run: |
+          ant -emacs compile-templates compile compile-native
+          mkdir -p out
+          cp bin/libs/native/macos/${{ matrix.arch }}/org/lwjgl/liblwjgl.dylib out/
+          git rev-parse HEAD > out/liblwjgl.dylib.git
+      - name: Build libbgfx
+        run: |
+          brew install ninja || true
+          bash tillage/build-bgfx.sh "$BGFX_CMAKE_TAG" out -DCMAKE_OSX_DEPLOYMENT_TARGET=${{ matrix.target }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.classifier }}
+          path: out
+
+  windows:
+    name: Windows ${{ matrix.arch }}
+    runs-on: windows-2022
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x64
+            msvc: amd64
+            classifier: natives-windows
+            cmake: ''
+          - arch: arm64
+            msvc: amd64_arm64
+            classifier: natives-windows-arm64
+            cmake: -DCMAKE_SYSTEM_NAME=Windows -DCMAKE_SYSTEM_PROCESSOR=ARM64
+    env:
+      LWJGL_BUILD_ARCH: ${{ matrix.arch }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: ${{ matrix.msvc }}
+      - name: Clone Oculus SDK
+        if: matrix.arch == 'x64'
+        run: git clone https://github.com/LWJGL-CI/OculusSDK.git ../OculusSDK
+      - uses: actions/setup-java@v4
+        with:
+          distribution: zulu
+          java-version: 25
+      - name: Build lwjgl.dll
+        shell: cmd
+        run: |
+          call ant -emacs compile-templates compile compile-native || exit /b 1
+          mkdir out
+          copy bin\libs\native\windows\${{ matrix.arch }}\org\lwjgl\lwjgl.dll out\ || exit /b 1
+          git rev-parse HEAD > out\lwjgl.dll.git
+      - name: Build bgfx.dll
+        shell: bash
+        run: bash tillage/build-bgfx.sh "$BGFX_CMAKE_TAG" out -DCMAKE_C_COMPILER=cl -DCMAKE_CXX_COMPILER=cl ${{ matrix.cmake }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.classifier }}
+          path: out
+
+  linux:
+    name: Linux ${{ matrix.arch }}
+    # AlmaLinux 8 (glibc 2.28), as upstream LWJGL, so the libraries load on older distributions.
+    runs-on: ${{ matrix.runner }}
+    container:
+      image: almalinux:8
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x64
+            runner: ubuntu-latest
+            classifier: natives-linux
+          - arch: arm64
+            runner: ubuntu-24.04-arm
+            classifier: natives-linux-arm64
+    env:
+      LWJGL_BUILD_ARCH: ${{ matrix.arch }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Install build dependencies
+        run: |
+          dnf -y install epel-release
+          dnf config-manager --set-enabled powertools
+          dnf -y install git gcc-toolset-15-gcc gcc-toolset-15-gcc-c++ ant make cmake ninja-build \
+            libX11-devel libXt-devel gtk3-devel dbus-devel mesa-libGL-devel mesa-libEGL-devel wayland-devel
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@v4
+        with:
+          distribution: zulu
+          java-version: 25
+      - name: Build liblwjgl
+        run: |
+          source /opt/rh/gcc-toolset-15/enable
+          git config --global --add safe.directory "$PWD"
+          ant -emacs compile-templates compile compile-native
+          mkdir -p out
+          cp bin/libs/native/linux/${{ matrix.arch }}/org/lwjgl/liblwjgl.so out/
+          git rev-parse HEAD > out/liblwjgl.so.git
+      - name: Build libbgfx
+        run: |
+          source /opt/rh/gcc-toolset-15/enable
+          bash tillage/build-bgfx.sh "$BGFX_CMAKE_TAG" out
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.classifier }}
+          path: out
+
+  package:
+    name: Package
+    needs: [java, macos, windows, linux]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: classes
+          path: bin/classes/lwjgl
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: natives-*
+          path: natives
+      - name: Package Maven repository
+        run: |
+          python3 tillage/package.py --base "$LWJGL_BASE" --version "$TILLAGE_VERSION" \
+            --classes bin/classes/lwjgl --sources modules/lwjgl/bgfx/src/generated/java \
+            --natives natives --out maven
+          (cd maven && zip -qr "../tillage-lwjgl-$TILLAGE_VERSION.zip" org)
+      - uses: actions/upload-artifact@v4
+        with:
+          name: tillage-maven
+          path: maven
+      - name: Publish release
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag="tillage-$TILLAGE_VERSION"
+          gh release delete "$tag" --repo "$GITHUB_REPOSITORY" --cleanup-tag --yes || true
+          gh release create "$tag" "tillage-lwjgl-$TILLAGE_VERSION.zip" --repo "$GITHUB_REPOSITORY" \
+            --target "$GITHUB_SHA" --title "LWJGL $TILLAGE_VERSION for Tillage" \
+            --notes "LWJGL $LWJGL_BASE core and bgfx with bgfx.cmake $BGFX_CMAKE_TAG. Built from $GITHUB_SHA."

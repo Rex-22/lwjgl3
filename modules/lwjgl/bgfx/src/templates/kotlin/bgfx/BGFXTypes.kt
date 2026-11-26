@@ -28,6 +28,7 @@ val bgfx_uniform_freq_t = "bgfx_uniform_freq_t".enumType
 val bgfx_uniform_type_t = "bgfx_uniform_type_t".enumType
 val bgfx_video_codec_t = "bgfx_video_codec_t".enumType
 val bgfx_view_mode_t = "bgfx_view_mode_t".enumType
+val bgfx_view_stats_type_t = "bgfx_view_stats_type_t".enumType
 
 val bgfx_view_id_t = typedef(uint16_t, "bgfx_view_id_t")
 
@@ -80,6 +81,7 @@ val bgfx_transform_t = struct(Module.BGFX, "BGFXTransform", nativeName = "bgfx_t
 val bgfx_view_stats_t = struct(Module.BGFX, "BGFXViewStats", nativeName = "bgfx_view_stats_t", mutable = false) {
     charASCII("name")[256]
     bgfx_view_id_t("view")
+    bgfx_view_stats_type_t("type")
     int64_t("cpuTimeBegin")
     int64_t("cpuTimeEnd")
     int64_t("gpuTimeBegin")
@@ -106,6 +108,14 @@ val bgfx_stats_t = struct(Module.BGFX, "BGFXStats", nativeName = "bgfx_stats_t",
 
     int64_t("waitRender")
     int64_t("waitSubmit")
+
+    int64_t("latencySleep")
+    int64_t("latencyTotal")
+    int64_t("latencySimulation")
+    int64_t("latencyRenderSubmit")
+    int64_t("latencyPresent")
+    int64_t("latencyQueue")
+    int64_t("latencyGpu")
 
     uint32_t("numDraw")
     uint32_t("numCompute")
@@ -142,7 +152,7 @@ val bgfx_stats_t = struct(Module.BGFX, "BGFXStats", nativeName = "bgfx_stats_t",
     uint16_t("textWidth")
     uint16_t("textHeight")
 
-    AutoSize("viewStats")..uint16_t("numViews")
+    AutoSize("viewStats")..uint16_t("numViewStats")
     bgfx_view_stats_t.p("viewStats")
 
     AutoSize("encoderStats")..uint16_t("numEncoders")
@@ -250,7 +260,7 @@ val bgfx_attachment_t = struct(Module.BGFX, "BGFXAttachment", nativeName = "bgfx
     uint16_t("mip")
     uint16_t("layer")
     uint16_t("numLayers")
-    uint8_t("resolve")
+    uint8_t("flags")
 }
 
 val bgfx_caps_gpu_t = struct(Module.BGFX, "BGFXCapsGPU", nativeName = "bgfx_caps_gpu_t", mutable = false) {
@@ -283,9 +293,10 @@ val bgfx_caps_limits_t = struct(Module.BGFX, "BGFXCapsLimits", nativeName = "bgf
     uint32_t("maxOcclusionQueries")
     uint32_t("maxEncoders")
     uint32_t("minResourceCbSize")
-    uint32_t("maxTransientVbSize")
-    uint32_t("maxTransientIbSize")
+    uint32_t("minTransientVbSize")
+    uint32_t("minTransientIbSize")
     uint32_t("minUniformBufferSize")
+    uint32_t("minUniformCacheSize")
     uint32_t("blitRowPitchAlign")
     uint32_t("blitOffsetAlign")
 }
@@ -466,49 +477,52 @@ val bgfx_allocator_interface_t = struct(Module.BGFX, "BGFXAllocatorInterface", n
     bgfx_allocator_vtbl_t.const.p("vtbl")
 }
 
-val bgfx_resolution_t = struct(Module.BGFX, "BGFXResolution", nativeName = "bgfx_resolution_t", skipBuffer = true) {
-    bgfx_texture_format_t("formatColor")
-    bgfx_texture_format_t("formatDepthStencil")
+val bgfx_swap_chain_t = struct(Module.BGFX, "BGFXSwapChain", nativeName = "bgfx_swap_chain_t", skipBuffer = true) {
+    nullable..opaque_p("nwh")
+    nullable..opaque_p("ndt")
     uint32_t("width")
     uint32_t("height")
-    uint32_t("reset")
+    uint32_t("flags")
+    bgfx_texture_format_t("formatColor")
+    bgfx_texture_format_t("formatDepthStencil")
+    bgfx_texture_handle_t("depth")
     uint8_t("numBackBuffers")
     uint8_t("maxFrameLatency")
-    uint8_t("debugTextScale")
 }
 
 val bgfx_init_limits_t = struct(Module.BGFX, "BGFXInitLimits", nativeName = "bgfx_init_limits_t", skipBuffer = true)  {
     uint16_t("maxEncoders")
     uint32_t("numDrawCalls")
     uint32_t("numDrawCallPeakFrames")
+    uint32_t("minViews")
     uint32_t("minResourceCbSize")
-    uint32_t("maxTransientVbSize")
-    uint32_t("maxTransientIbSize")
+    uint32_t("minTransientVbSize")
+    uint32_t("minTransientIbSize")
     uint32_t("minUniformBufferSize")
+    uint32_t("minUniformCacheSize")
 }
 
 val bgfx_platform_data_t = struct(Module.BGFX, "BGFXPlatformData", nativeName = "bgfx_platform_data_t", skipBuffer = true) {
-    nullable..opaque_p("ndt")
-    nullable..opaque_p("nwh")
     nullable..opaque_p("context")
     nullable..opaque_p("queue")
-    nullable..opaque_p("backBuffer")
-    nullable..opaque_p("backBufferDS")
     bgfx_native_window_handle_type_t("type")
 }
 
 val bgfx_init_t = struct(Module.BGFX, "BGFXInit", nativeName = "bgfx_init_t", skipBuffer = true) {
     bgfx_renderer_type_t("type")
+    bgfx_renderer_type_t("backendType")
     uint16_t("vendorId")
     uint16_t("deviceId")
     uint64_t("capabilities")
     bool("debug")
+    uint32_t("diagnostics")
     bool("profile")
     bool("fallback")
     bool("videoDecode")
 
     bgfx_platform_data_t("platformData")
-    bgfx_resolution_t("resolution")
+    bgfx_swap_chain_t("swapChain")
+    uint32_t("reset")
     bgfx_init_limits_t("limits")
 
     nullable..bgfx_callback_interface_t.p("callback")
@@ -522,4 +536,5 @@ val bgfx_render_frame_t = "bgfx_render_frame_t".enumType
 val bgfx_internal_data_t = struct(Module.BGFX, "BGFXInternalData", nativeName = "bgfx_internal_data_t", mutable = false, skipBuffer = true) {
     bgfx_caps_t.p("caps")
     opaque_p("context")
+    opaque_p("queue")
 }

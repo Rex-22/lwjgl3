@@ -9,7 +9,7 @@ import org.lwjgl.generator.*
 
 val BGFX = "BGFX".nativeClass(Module.BGFX, prefix = "BGFX", prefixMethod = "bgfx_", binding = BGFX_BINDING) {
     IntConstant(
-        "API_VERSION".."157"
+        "API_VERSION".."172"
     )
 
     ShortConstant(
@@ -226,6 +226,15 @@ val BGFX = "BGFX".nativeClass(Module.BGFX, prefix = "BGFX", prefixMethod = "bgfx
     )
 
     IntConstant(
+        "DIAGNOSTIC_NONE"..0x00000000,
+        "DIAGNOSTIC_VERBOSE"..0x00000001,
+        "DIAGNOSTIC_GPU_VALIDATION"..0x00000002,
+        "DIAGNOSTIC_SYNC_VALIDATION"..0x00000004,
+        "DIAGNOSTIC_SERIALIZE"..0x00000008,
+        "DIAGNOSTIC_DRAW_VALIDATION"..0x00000010
+    )
+
+    IntConstant(
         "BUFFER_NONE"..0x0000,
         "BUFFER_COMPUTE_READ"..0x0100,
         "BUFFER_COMPUTE_WRITE"..0x0200,
@@ -252,16 +261,19 @@ val BGFX = "BGFX".nativeClass(Module.BGFX, prefix = "BGFX", prefixMethod = "bgfx
         "TEXTURE_SRGB"..0x0000200000000000L,
         "TEXTURE_BLIT_DST"..0x0000400000000000L,
         "TEXTURE_READ_BACK"..0x0000800000000000L,
-        "TEXTURE_EXTERNAL_SHARED"..0x0001000000000000L
+        "TEXTURE_EXTERNAL_SHARED"..0x0001000000000000L,
+        "TEXTURE_SRGB_MUTABLE"..0x0040000000000000L
     )
 
     IntConstant(
-        "TEXTURE_RT_MSAA_SHIFT".."36"
+        "TEXTURE_RT_MSAA_SHIFT".."36",
+        "TEXTURE_MIP_COUNT_SHIFT".."49"
     )
 
     LongConstant(
         "TEXTURE_RT_MSAA_MASK"..0x0000007000000000L,
-        "TEXTURE_RT_MASK"..0x000000f000000000L
+        "TEXTURE_RT_MASK"..0x000000f000000000L,
+        "TEXTURE_MIP_COUNT_MASK"..0x003e000000000000L
     )
 
     IntConstant(
@@ -302,7 +314,8 @@ val BGFX = "BGFX".nativeClass(Module.BGFX, prefix = "BGFX", prefixMethod = "bgfx
         "SAMPLER_COMPARE_NEVER"..0x00070000,
         "SAMPLER_COMPARE_ALWAYS"..0x00080000,
 
-        "SAMPLER_SAMPLE_STENCIL"..0x00100000
+        "SAMPLER_SAMPLE_STENCIL"..0x00100000,
+        "SAMPLER_SRGB"..0x00200000
     )
 
     IntConstant(
@@ -363,9 +376,12 @@ val BGFX = "BGFX".nativeClass(Module.BGFX, prefix = "BGFX", prefixMethod = "bgfx
         "RESET_SRGB_BACKBUFFER"..0x00008000,
         "RESET_HDR10"..0x00010000,
         "RESET_HIDPI"..0x00020000,
-        "RESET_DEPTH_CLAMP"..0x00040000,
         "RESET_SUSPEND"..0x00080000,
-        "RESET_TRANSPARENT_BACKBUFFER"..0x00100000
+        "RESET_TRANSPARENT_BACKBUFFER"..0x00100000,
+        "RESET_LOW_LATENCY_ON"..0x00000400,
+        "RESET_LOW_LATENCY_BOOST"..0x00000800,
+        "RESET_LOW_LATENCY_SHIFT".."10",
+        "RESET_LOW_LATENCY_MASK"..0x00000c00
     )
 
     IntConstant(
@@ -373,43 +389,48 @@ val BGFX = "BGFX".nativeClass(Module.BGFX, prefix = "BGFX", prefixMethod = "bgfx
         "RESET_RESERVED_MASK".."0x80000000"
     )
 
+    IntConstant(
+        "SWAP_CHAIN_NONE"..0x00000000,
+        "SWAP_CHAIN_FULLSCREEN"..0x00000001,
+        "SWAP_CHAIN_FULLSCREEN_SHIFT".."0",
+        "SWAP_CHAIN_FULLSCREEN_MASK"..0x00000001,
+        "SWAP_CHAIN_MSAA_X2"..0x00000010,
+        "SWAP_CHAIN_MSAA_X4"..0x00000020,
+        "SWAP_CHAIN_MSAA_X8"..0x00000030,
+        "SWAP_CHAIN_MSAA_X16"..0x00000040,
+        "SWAP_CHAIN_MSAA_SHIFT".."4",
+        "SWAP_CHAIN_MSAA_MASK"..0x00000070,
+        "SWAP_CHAIN_SRGB_BACKBUFFER"..0x00008000,
+        "SWAP_CHAIN_HDR10"..0x00010000,
+        "SWAP_CHAIN_HIDPI"..0x00020000,
+        "SWAP_CHAIN_TRANSPARENT_BACKBUFFER"..0x00100000
+    )
+
     LongConstant(
-        "CAPS_ALPHA_TO_COVERAGE"..0x0000000000000001L,
-        "CAPS_BLEND_INDEPENDENT"..0x0000000000000002L,
-        "CAPS_COMPUTE"..0x0000000000000004L,
-        "CAPS_CONSERVATIVE_RASTER"..0x0000000000000008L,
-        "CAPS_DRAW_INDIRECT"..0x0000000000000010L,
-        "CAPS_DRAW_INDIRECT_COUNT"..0x0000000000000020L,
-        "CAPS_FRAGMENT_DEPTH"..0x0000000000000040L,
-        "CAPS_FRAGMENT_ORDERING"..0x0000000000000080L,
-        "CAPS_GRAPHICS_DEBUGGER"..0x0000000000000100L,
-        "CAPS_HDR10"..0x0000000000000200L,
-        "CAPS_HIDPI"..0x0000000000000400L,
-        "CAPS_IMAGE_RW"..0x0000000000000800L,
-        "CAPS_INDEX32"..0x0000000000001000L,
-        "CAPS_INSTANCING"..0x0000000000002000L,
-        "CAPS_OCCLUSION_QUERY"..0x0000000000004000L,
-        "CAPS_PRIMITIVE_ID"..0x0000000000008000L,
-        "CAPS_RENDERER_MULTITHREADED"..0x0000000000010000L,
-        "CAPS_SWAP_CHAIN"..0x0000000000020000L,
-        "CAPS_TEXTURE_BLIT"..0x0000000000040000L,
-        "CAPS_TEXTURE_COMPARE_LEQUAL"..0x0000000000080000L,
-        "CAPS_TEXTURE_COMPARE_RESERVED"..0x0000000000100000L,
-        "CAPS_TEXTURE_CUBE_ARRAY"..0x0000000000200000L,
-        "CAPS_TEXTURE_DIRECT_ACCESS"..0x0000000000400000L,
-        "CAPS_TEXTURE_EXTERNAL"..0x0000000000800000L,
-        "CAPS_TEXTURE_EXTERNAL_SHARED"..0x0000000001000000L,
-        "CAPS_TEXTURE_READ_BACK"..0x0000000002000000L,
-        "CAPS_TEXTURE_2D_ARRAY"..0x0000000004000000L,
-        "CAPS_TEXTURE_3D"..0x0000000008000000L,
-        "CAPS_TRANSPARENT_BACKBUFFER"..0x0000000010000000L,
-        "CAPS_VARIABLE_RATE_SHADING"..0x0000000020000000L,
-        "CAPS_VERTEX_ATTRIB_HALF"..0x0000000040000000L,
-        "CAPS_VERTEX_ATTRIB_UINT10"..0x0000000080000000L,
-        "CAPS_VERTEX_ID"..0x0000000100000000L,
-        "CAPS_VIDEO_DECODE"..0x0000000200000000L,
-        "CAPS_VIEWPORT_LAYER_ARRAY"..0x0000000400000000,
-        "CAPS_TEXTURE_COMPARE_ALL".."BGFX_CAPS_TEXTURE_COMPARE_RESERVED | BGFX_CAPS_TEXTURE_COMPARE_LEQUAL"
+        "CAPS_BLEND_INDEPENDENT"..0x0000000000000001L,
+        "CAPS_COMPUTE"..0x0000000000000002L,
+        "CAPS_CONSERVATIVE_RASTER"..0x0000000000000004L,
+        "CAPS_DRAW_INDIRECT"..0x0000000000000008L,
+        "CAPS_DRAW_INDIRECT_COUNT"..0x0000000000000010L,
+        "CAPS_FRAGMENT_ORDERING"..0x0000000000000020L,
+        "CAPS_GRAPHICS_DEBUGGER"..0x0000000000000040L,
+        "CAPS_HDR10"..0x0000000000000080L,
+        "CAPS_IMAGE_RW"..0x0000000000000100L,
+        "CAPS_INDEX32"..0x0000000000000200L,
+        "CAPS_LOW_LATENCY"..0x0000000000000400L,
+        "CAPS_PRIMITIVE_ID"..0x0000000000000800L,
+        "CAPS_RENDERER_MULTITHREADED"..0x0000000000001000L,
+        "CAPS_SHADER_F16"..0x0000000000002000L,
+        "CAPS_SWAP_CHAIN"..0x0000000000004000L,
+        "CAPS_TEXTURE_CUBE_ARRAY"..0x0000000000008000L,
+        "CAPS_TEXTURE_DIRECT_ACCESS"..0x0000000000010000L,
+        "CAPS_TEXTURE_EXTERNAL"..0x0000000000020000L,
+        "CAPS_TEXTURE_EXTERNAL_SHARED"..0x0000000000040000L,
+        "CAPS_TRANSPARENT_BACKBUFFER"..0x0000000000080000L,
+        "CAPS_VARIABLE_RATE_SHADING"..0x0000000000100000L,
+        "CAPS_VERTEX_ATTRIB_UINT10"..0x0000000000200000L,
+        "CAPS_VIDEO_DECODE"..0x0000000000400000L,
+        "CAPS_VIEWPORT_LAYER_ARRAY"..0x0000000000800000L
     )
 
     IntConstant(
@@ -427,11 +448,20 @@ val BGFX = "BGFX".nativeClass(Module.BGFX, prefix = "BGFX", prefixMethod = "bgfx
         "CAPS_FORMAT_TEXTURE_IMAGE_READ"..0x00000400,
         "CAPS_FORMAT_TEXTURE_IMAGE_WRITE"..0x00000800,
         "CAPS_FORMAT_TEXTURE_FRAMEBUFFER"..0x00001000,
-        "CAPS_FORMAT_TEXTURE_FRAMEBUFFER_MSAA"..0x00002000,
-        "CAPS_FORMAT_TEXTURE_MSAA"..0x00004000,
-        "CAPS_FORMAT_TEXTURE_MIP_AUTOGEN"..0x00008000,
-        "CAPS_FORMAT_TEXTURE_BACKBUFFER"..0x00010000,
-        "CAPS_FORMAT_TEXTURE_VIDEO_DECODE_DST"..0x00020000
+        "CAPS_FORMAT_TEXTURE_MSAA"..0x00002000,
+        "CAPS_FORMAT_TEXTURE_MIP_AUTOGEN"..0x00004000,
+        "CAPS_FORMAT_TEXTURE_BACKBUFFER"..0x00008000,
+        "CAPS_FORMAT_TEXTURE_VIDEO_DECODE_DST"..0x00010000,
+        "CAPS_FORMAT_TEXTURE_FRAMEBUFFER_MSAA_X2"..0x00020000,
+        "CAPS_FORMAT_TEXTURE_FRAMEBUFFER_MSAA_X4"..0x00040000,
+        "CAPS_FORMAT_TEXTURE_FRAMEBUFFER_MSAA_X8"..0x00080000,
+        "CAPS_FORMAT_TEXTURE_FRAMEBUFFER_MSAA_X16"..0x00100000,
+        "CAPS_FORMAT_TEXTURE_FRAMEBUFFER_MSAA".."""(0
+        | BGFX_CAPS_FORMAT_TEXTURE_FRAMEBUFFER_MSAA_X2
+        | BGFX_CAPS_FORMAT_TEXTURE_FRAMEBUFFER_MSAA_X4
+        | BGFX_CAPS_FORMAT_TEXTURE_FRAMEBUFFER_MSAA_X8
+        | BGFX_CAPS_FORMAT_TEXTURE_FRAMEBUFFER_MSAA_X16)
+        """
     )
 
     IntConstant(
@@ -458,8 +488,11 @@ val BGFX = "BGFX".nativeClass(Module.BGFX, prefix = "BGFX", prefixMethod = "bgfx
     )
 
     ByteConstant(
-        "RESOLVE_NONE"..0x00.b,
-        "RESOLVE_AUTO_GEN_MIPS"..0x01.b
+        "ATTACHMENT_NONE"..0x00.b,
+        "ATTACHMENT_AUTO_GEN_MIPS"..0x01.b,
+        "ATTACHMENT_READ_ONLY_DEPTH"..0x02.b,
+        "ATTACHMENT_READ_ONLY_STENCIL"..0x04.b,
+        "ATTACHMENT_SRGB"..0x08.b
     )
 
     ShortConstant(
@@ -470,7 +503,8 @@ val BGFX = "BGFX".nativeClass(Module.BGFX, prefix = "BGFX", prefixMethod = "bgfx
         "PCI_ID_INTEL".."(short)0x8086",
         "PCI_ID_NVIDIA"..0x10de.s,
         "PCI_ID_MICROSOFT"..0x1414.s,
-        "PCI_ID_ARM"..0x13b5.s
+        "PCI_ID_ARM"..0x13b5.s,
+        "PCI_ID_GOOGLE"..0x1ae0.s
     )
 
     ByteConstant(
@@ -775,6 +809,14 @@ val BGFX = "BGFX".nativeClass(Module.BGFX, prefix = "BGFX", prefixMethod = "bgfx
     )
 
     EnumConstant(
+        "VIEW_STATS_TYPE_BLIT".enum,
+        "VIEW_STATS_TYPE_COMPUTE".enum,
+        "VIEW_STATS_TYPE_DRAW".enum,
+
+        "VIEW_STATS_TYPE_COUNT".enum
+    )
+
+    EnumConstant(
         "SHADING_RATE_RATE_1X_1".enum("0"),
         "SHADING_RATE_RATE_1X_2".enum,
         "SHADING_RATE_RATE_2X_1".enum,
@@ -829,7 +871,7 @@ val BGFX = "BGFX".nativeClass(Module.BGFX, prefix = "BGFX", prefixMethod = "bgfx
         MapToInt..uint16_t("_layer"),
         MapToInt..uint16_t("_numLayers"),
         MapToInt..uint16_t("_mip"),
-        MapToInt..uint8_t("_resolve")
+        MapToInt..uint8_t("_flags")
     )
 
     bgfx_vertex_layout_t.p(
@@ -1000,10 +1042,8 @@ val BGFX = "BGFX".nativeClass(Module.BGFX, prefix = "BGFX", prefixMethod = "bgfx
     void(
         "reset",
 
-        uint32_t("_width"),
-        uint32_t("_height"),
         uint32_t("_flags"),
-        bgfx_texture_format_t("_format")
+        nullable..bgfx_swap_chain_t.const.p("_swapChain")
     )
 
     uint32_t(
@@ -1059,7 +1099,9 @@ val BGFX = "BGFX".nativeClass(Module.BGFX, prefix = "BGFX", prefixMethod = "bgfx
     void(
         "set_debug",
 
-        uint32_t("_debug")
+        uint32_t("_debug"),
+        bgfx_frame_buffer_handle_t("_handle"),
+        MapToInt..uint8_t("_scale")
     )
 
     void(
@@ -1553,13 +1595,16 @@ val BGFX = "BGFX".nativeClass(Module.BGFX, prefix = "BGFX", prefixMethod = "bgfx
     )
 
     bgfx_frame_buffer_handle_t(
-        "create_frame_buffer_from_nwh",
+        "create_frame_buffer_from_swap_chain",
 
-        opaque_p("_nwh"),
-        MapToInt..uint16_t("_width"),
-        MapToInt..uint16_t("_height"),
-        bgfx_texture_format_t("_format"),
-        bgfx_texture_format_t("_depthFormat")
+        bgfx_swap_chain_t.const.p("_desc")
+    )
+
+    void(
+        "update_swap_chain",
+
+        bgfx_frame_buffer_handle_t("_handle"),
+        bgfx_swap_chain_t.const.p("_desc")
     )
 
     void(
@@ -1671,7 +1716,9 @@ val BGFX = "BGFX".nativeClass(Module.BGFX, prefix = "BGFX", prefixMethod = "bgfx
         MapToInt..int16_t("_x"),
         MapToInt..int16_t("_y"),
         MapToInt..uint16_t("_width"),
-        MapToInt..uint16_t("_height")
+        MapToInt..uint16_t("_height"),
+        float("_minDepth"),
+        float("_maxDepth")
     )
 
     void(
@@ -1691,6 +1738,22 @@ val BGFX = "BGFX".nativeClass(Module.BGFX, prefix = "BGFX", prefixMethod = "bgfx
         MapToInt..uint16_t("_y"),
         MapToInt..uint16_t("_width"),
         MapToInt..uint16_t("_height")
+    )
+
+    void(
+        "set_view_depth_bias",
+
+        MapToInt..bgfx_view_id_t("_id"),
+        int32_t("_constant"),
+        float("_slopeScale"),
+        float("_clamp")
+    )
+
+    void(
+        "set_view_sample_mask",
+
+        MapToInt..bgfx_view_id_t("_id"),
+        uint32_t("_mask")
     )
 
     void(
@@ -1811,6 +1874,13 @@ val BGFX = "BGFX".nativeClass(Module.BGFX, prefix = "BGFX", prefixMethod = "bgfx
         uint32_t("_bstencil")
     )
 
+    void(
+        "encoder_set_sample_mask",
+
+        bgfx_encoder_t.p("_this"),
+        uint32_t("_mask")
+    )
+
     uint16_t(
         "encoder_set_scissor",
 
@@ -1823,6 +1893,23 @@ val BGFX = "BGFX".nativeClass(Module.BGFX, prefix = "BGFX", prefixMethod = "bgfx
 
     void(
         "encoder_set_scissor_cached",
+
+        bgfx_encoder_t.p("_this"),
+        MapToInt..uint16_t("_cache")
+    )
+
+    uint16_t(
+        "encoder_set_depth_control",
+
+        bgfx_encoder_t.p("_this"),
+        int32_t("_constant"),
+        float("_slopeScale"),
+        float("_clamp"),
+        bool("_depthClamp")
+    )
+
+    void(
+        "encoder_set_depth_control_cached",
 
         bgfx_encoder_t.p("_this"),
         MapToInt..uint16_t("_cache")
@@ -1856,6 +1943,21 @@ val BGFX = "BGFX".nativeClass(Module.BGFX, prefix = "BGFX", prefixMethod = "bgfx
 
     void(
         "encoder_set_uniform",
+
+        bgfx_encoder_t.p("_this"),
+        bgfx_uniform_handle_t("_handle"),
+        MultiType(
+            PointerMapping.DATA_SHORT,
+            PointerMapping.DATA_INT,
+            PointerMapping.DATA_LONG,
+            PointerMapping.DATA_FLOAT,
+            PointerMapping.DATA_DOUBLE
+        )..Unsafe..void.const.p("_value"),
+        MapToInt..uint16_t("_num")
+    )
+
+    void(
+        "encoder_set_uniform_ref",
 
         bgfx_encoder_t.p("_this"),
         bgfx_uniform_handle_t("_handle"),
@@ -2050,7 +2152,9 @@ val BGFX = "BGFX".nativeClass(Module.BGFX, prefix = "BGFX", prefixMethod = "bgfx
         MapToInt..uint16_t("_numLayers"),
         MapToInt..uint8_t("_firstMip"),
         MapToInt..uint8_t("_numMips"),
-        uint32_t("_flags")
+        uint32_t("_flags"),
+        MapToInt..uint8_t("_lodMin"),
+        MapToInt..uint8_t("_lodMax")
     )
 
     void(
@@ -2115,7 +2219,9 @@ val BGFX = "BGFX".nativeClass(Module.BGFX, prefix = "BGFX", prefixMethod = "bgfx
         bgfx_encoder_t.p("_this"),
         MapToInt..uint8_t("_stage"),
         bgfx_index_buffer_handle_t("_handle"),
-        bgfx_access_t("_access")
+        bgfx_access_t("_access"),
+        uint32_t("_offset"),
+        uint32_t("_size")
     )
 
     void(
@@ -2124,7 +2230,9 @@ val BGFX = "BGFX".nativeClass(Module.BGFX, prefix = "BGFX", prefixMethod = "bgfx
         bgfx_encoder_t.p("_this"),
         MapToInt..uint8_t("_stage"),
         bgfx_vertex_buffer_handle_t("_handle"),
-        bgfx_access_t("_access")
+        bgfx_access_t("_access"),
+        uint32_t("_offset"),
+        uint32_t("_size")
     )
 
     void(
@@ -2133,7 +2241,9 @@ val BGFX = "BGFX".nativeClass(Module.BGFX, prefix = "BGFX", prefixMethod = "bgfx
         bgfx_encoder_t.p("_this"),
         MapToInt..uint8_t("_stage"),
         bgfx_dynamic_index_buffer_handle_t("_handle"),
-        bgfx_access_t("_access")
+        bgfx_access_t("_access"),
+        uint32_t("_offset"),
+        uint32_t("_size")
     )
 
     void(
@@ -2142,7 +2252,9 @@ val BGFX = "BGFX".nativeClass(Module.BGFX, prefix = "BGFX", prefixMethod = "bgfx
         bgfx_encoder_t.p("_this"),
         MapToInt..uint8_t("_stage"),
         bgfx_dynamic_vertex_buffer_handle_t("_handle"),
-        bgfx_access_t("_access")
+        bgfx_access_t("_access"),
+        uint32_t("_offset"),
+        uint32_t("_size")
     )
 
     void(
@@ -2280,6 +2392,12 @@ val BGFX = "BGFX".nativeClass(Module.BGFX, prefix = "BGFX", prefixMethod = "bgfx
         uint32_t("_bstencil")
     )
 
+    void(
+        "set_sample_mask",
+
+        uint32_t("_mask")
+    )
+
     uint16_t(
         "set_scissor",
 
@@ -2291,6 +2409,21 @@ val BGFX = "BGFX".nativeClass(Module.BGFX, prefix = "BGFX", prefixMethod = "bgfx
 
     void(
         "set_scissor_cached",
+
+        MapToInt..uint16_t("_cache")
+    )
+
+    uint16_t(
+        "set_depth_control",
+
+        int32_t("_constant"),
+        float("_slopeScale"),
+        float("_clamp"),
+        bool("_depthClamp")
+    )
+
+    void(
+        "set_depth_control_cached",
 
         MapToInt..uint16_t("_cache")
     )
@@ -2320,6 +2453,20 @@ val BGFX = "BGFX".nativeClass(Module.BGFX, prefix = "BGFX", prefixMethod = "bgfx
 
     void(
         "set_uniform",
+
+        bgfx_uniform_handle_t("_handle"),
+        MultiType(
+            PointerMapping.DATA_SHORT,
+            PointerMapping.DATA_INT,
+            PointerMapping.DATA_LONG,
+            PointerMapping.DATA_FLOAT,
+            PointerMapping.DATA_DOUBLE
+        )..Unsafe..void.const.p("_value"),
+        MapToInt..uint16_t("_num")
+    )
+
+    void(
+        "set_uniform_ref",
 
         bgfx_uniform_handle_t("_handle"),
         MultiType(
@@ -2468,7 +2615,9 @@ val BGFX = "BGFX".nativeClass(Module.BGFX, prefix = "BGFX", prefixMethod = "bgfx
         MapToInt..uint16_t("_numLayers"),
         MapToInt..uint8_t("_firstMip"),
         MapToInt..uint8_t("_numMips"),
-        uint32_t("_flags")
+        uint32_t("_flags"),
+        MapToInt..uint8_t("_lodMin"),
+        MapToInt..uint8_t("_lodMax")
     )
 
     void(
@@ -2527,7 +2676,9 @@ val BGFX = "BGFX".nativeClass(Module.BGFX, prefix = "BGFX", prefixMethod = "bgfx
 
         MapToInt..uint8_t("_stage"),
         bgfx_index_buffer_handle_t("_handle"),
-        bgfx_access_t("_access")
+        bgfx_access_t("_access"),
+        uint32_t("_offset"),
+        uint32_t("_size")
     )
 
     void(
@@ -2535,7 +2686,9 @@ val BGFX = "BGFX".nativeClass(Module.BGFX, prefix = "BGFX", prefixMethod = "bgfx
 
         MapToInt..uint8_t("_stage"),
         bgfx_vertex_buffer_handle_t("_handle"),
-        bgfx_access_t("_access")
+        bgfx_access_t("_access"),
+        uint32_t("_offset"),
+        uint32_t("_size")
     )
 
     void(
@@ -2543,7 +2696,9 @@ val BGFX = "BGFX".nativeClass(Module.BGFX, prefix = "BGFX", prefixMethod = "bgfx
 
         MapToInt..uint8_t("_stage"),
         bgfx_dynamic_index_buffer_handle_t("_handle"),
-        bgfx_access_t("_access")
+        bgfx_access_t("_access"),
+        uint32_t("_offset"),
+        uint32_t("_size")
     )
 
     void(
@@ -2551,7 +2706,9 @@ val BGFX = "BGFX".nativeClass(Module.BGFX, prefix = "BGFX", prefixMethod = "bgfx
 
         MapToInt..uint8_t("_stage"),
         bgfx_dynamic_vertex_buffer_handle_t("_handle"),
-        bgfx_access_t("_access")
+        bgfx_access_t("_access"),
+        uint32_t("_offset"),
+        uint32_t("_size")
     )
 
     void(

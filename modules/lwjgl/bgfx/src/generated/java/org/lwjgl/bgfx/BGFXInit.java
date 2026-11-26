@@ -19,15 +19,18 @@ import static org.lwjgl.system.MemoryStack.*;
  * <pre><code>
  * struct bgfx_init_t {
  *     bgfx_renderer_type_t type;
+ *     bgfx_renderer_type_t backendType;
  *     uint16_t vendorId;
  *     uint16_t deviceId;
  *     uint64_t capabilities;
  *     bool debug;
+ *     uint32_t diagnostics;
  *     bool profile;
  *     bool fallback;
  *     bool videoDecode;
  *     {@link BGFXPlatformData bgfx_platform_data_t} platformData;
- *     {@link BGFXResolution bgfx_resolution_t} resolution;
+ *     {@link BGFXSwapChain bgfx_swap_chain_t} swapChain;
+ *     uint32_t reset;
  *     {@link BGFXInitLimits bgfx_init_limits_t} limits;
  *     {@link BGFXCallbackInterface bgfx_callback_interface_t} * callback;
  *     {@link BGFXAllocatorInterface bgfx_allocator_interface_t} * allocator;
@@ -45,35 +48,41 @@ public class BGFXInit extends Struct<BGFXInit> implements NativeResource {
     /** The struct member offsets. */
     public static final int
         TYPE,
+        BACKENDTYPE,
         VENDORID,
         DEVICEID,
         CAPABILITIES,
         DEBUG,
+        DIAGNOSTICS,
         PROFILE,
         FALLBACK,
         VIDEODECODE,
         PLATFORMDATA,
-        RESOLUTION,
+        SWAPCHAIN,
+        RESET,
         LIMITS,
         CALLBACK,
         ALLOCATOR;
 
     static {
         BGFXPlatformData.createSafe(NULL);
-        BGFXResolution.createSafe(NULL);
+        BGFXSwapChain.createSafe(NULL);
         BGFXInitLimits.createSafe(NULL);
 
         Layout layout = __struct(
+            __member(4),
             __member(4),
             __member(2),
             __member(2),
             __member(8),
             __member(1),
+            __member(4),
             __member(1),
             __member(1),
             __member(1),
             __member(BGFXPlatformData.SIZEOF, BGFXPlatformData.ALIGNOF),
-            __member(BGFXResolution.SIZEOF, BGFXResolution.ALIGNOF),
+            __member(BGFXSwapChain.SIZEOF, BGFXSwapChain.ALIGNOF),
+            __member(4),
             __member(BGFXInitLimits.SIZEOF, BGFXInitLimits.ALIGNOF),
             __member(POINTER_SIZE),
             __member(POINTER_SIZE)
@@ -83,18 +92,21 @@ public class BGFXInit extends Struct<BGFXInit> implements NativeResource {
         ALIGNOF = layout.getAlignment();
 
         TYPE = layout.offsetof(0);
-        VENDORID = layout.offsetof(1);
-        DEVICEID = layout.offsetof(2);
-        CAPABILITIES = layout.offsetof(3);
-        DEBUG = layout.offsetof(4);
-        PROFILE = layout.offsetof(5);
-        FALLBACK = layout.offsetof(6);
-        VIDEODECODE = layout.offsetof(7);
-        PLATFORMDATA = layout.offsetof(8);
-        RESOLUTION = layout.offsetof(9);
-        LIMITS = layout.offsetof(10);
-        CALLBACK = layout.offsetof(11);
-        ALLOCATOR = layout.offsetof(12);
+        BACKENDTYPE = layout.offsetof(1);
+        VENDORID = layout.offsetof(2);
+        DEVICEID = layout.offsetof(3);
+        CAPABILITIES = layout.offsetof(4);
+        DEBUG = layout.offsetof(5);
+        DIAGNOSTICS = layout.offsetof(6);
+        PROFILE = layout.offsetof(7);
+        FALLBACK = layout.offsetof(8);
+        VIDEODECODE = layout.offsetof(9);
+        PLATFORMDATA = layout.offsetof(10);
+        SWAPCHAIN = layout.offsetof(11);
+        RESET = layout.offsetof(12);
+        LIMITS = layout.offsetof(13);
+        CALLBACK = layout.offsetof(14);
+        ALLOCATOR = layout.offsetof(15);
     }
 
     protected BGFXInit(long address, @Nullable ByteBuffer container) {
@@ -122,6 +134,9 @@ public class BGFXInit extends Struct<BGFXInit> implements NativeResource {
     /** @return the value of the {@code type} field. */
     @NativeType("bgfx_renderer_type_t")
     public int type() { return ntype(address()); }
+    /** @return the value of the {@code backendType} field. */
+    @NativeType("bgfx_renderer_type_t")
+    public int backendType() { return nbackendType(address()); }
     /** @return the value of the {@code vendorId} field. */
     @NativeType("uint16_t")
     public short vendorId() { return nvendorId(address()); }
@@ -134,6 +149,9 @@ public class BGFXInit extends Struct<BGFXInit> implements NativeResource {
     /** @return the value of the {@code debug} field. */
     @NativeType("bool")
     public boolean debug() { return ndebug(address()); }
+    /** @return the value of the {@code diagnostics} field. */
+    @NativeType("uint32_t")
+    public int diagnostics() { return ndiagnostics(address()); }
     /** @return the value of the {@code profile} field. */
     @NativeType("bool")
     public boolean profile() { return nprofile(address()); }
@@ -146,9 +164,12 @@ public class BGFXInit extends Struct<BGFXInit> implements NativeResource {
     /** @return a {@link BGFXPlatformData} view of the {@code platformData} field. */
     @NativeType("bgfx_platform_data_t")
     public BGFXPlatformData platformData() { return nplatformData(address()); }
-    /** @return a {@link BGFXResolution} view of the {@code resolution} field. */
-    @NativeType("bgfx_resolution_t")
-    public BGFXResolution resolution() { return nresolution(address()); }
+    /** @return a {@link BGFXSwapChain} view of the {@code swapChain} field. */
+    @NativeType("bgfx_swap_chain_t")
+    public BGFXSwapChain swapChain() { return nswapChain(address()); }
+    /** @return the value of the {@code reset} field. */
+    @NativeType("uint32_t")
+    public int reset() { return nreset(address()); }
     /** @return a {@link BGFXInitLimits} view of the {@code limits} field. */
     @NativeType("bgfx_init_limits_t")
     public BGFXInitLimits limits() { return nlimits(address()); }
@@ -161,6 +182,8 @@ public class BGFXInit extends Struct<BGFXInit> implements NativeResource {
 
     /** Sets the specified value to the {@code type} field. */
     public BGFXInit type(@NativeType("bgfx_renderer_type_t") int value) { ntype(address(), value); return this; }
+    /** Sets the specified value to the {@code backendType} field. */
+    public BGFXInit backendType(@NativeType("bgfx_renderer_type_t") int value) { nbackendType(address(), value); return this; }
     /** Sets the specified value to the {@code vendorId} field. */
     public BGFXInit vendorId(@NativeType("uint16_t") short value) { nvendorId(address(), value); return this; }
     /** Sets the specified value to the {@code deviceId} field. */
@@ -169,6 +192,8 @@ public class BGFXInit extends Struct<BGFXInit> implements NativeResource {
     public BGFXInit capabilities(@NativeType("uint64_t") long value) { ncapabilities(address(), value); return this; }
     /** Sets the specified value to the {@code debug} field. */
     public BGFXInit debug(@NativeType("bool") boolean value) { ndebug(address(), value); return this; }
+    /** Sets the specified value to the {@code diagnostics} field. */
+    public BGFXInit diagnostics(@NativeType("uint32_t") int value) { ndiagnostics(address(), value); return this; }
     /** Sets the specified value to the {@code profile} field. */
     public BGFXInit profile(@NativeType("bool") boolean value) { nprofile(address(), value); return this; }
     /** Sets the specified value to the {@code fallback} field. */
@@ -179,10 +204,12 @@ public class BGFXInit extends Struct<BGFXInit> implements NativeResource {
     public BGFXInit platformData(@NativeType("bgfx_platform_data_t") BGFXPlatformData value) { nplatformData(address(), value); return this; }
     /** Passes the {@code platformData} field to the specified {@link java.util.function.Consumer Consumer}. */
     public BGFXInit platformData(java.util.function.Consumer<BGFXPlatformData> consumer) { consumer.accept(platformData()); return this; }
-    /** Copies the specified {@link BGFXResolution} to the {@code resolution} field. */
-    public BGFXInit resolution(@NativeType("bgfx_resolution_t") BGFXResolution value) { nresolution(address(), value); return this; }
-    /** Passes the {@code resolution} field to the specified {@link java.util.function.Consumer Consumer}. */
-    public BGFXInit resolution(java.util.function.Consumer<BGFXResolution> consumer) { consumer.accept(resolution()); return this; }
+    /** Copies the specified {@link BGFXSwapChain} to the {@code swapChain} field. */
+    public BGFXInit swapChain(@NativeType("bgfx_swap_chain_t") BGFXSwapChain value) { nswapChain(address(), value); return this; }
+    /** Passes the {@code swapChain} field to the specified {@link java.util.function.Consumer Consumer}. */
+    public BGFXInit swapChain(java.util.function.Consumer<BGFXSwapChain> consumer) { consumer.accept(swapChain()); return this; }
+    /** Sets the specified value to the {@code reset} field. */
+    public BGFXInit reset(@NativeType("uint32_t") int value) { nreset(address(), value); return this; }
     /** Copies the specified {@link BGFXInitLimits} to the {@code limits} field. */
     public BGFXInit limits(@NativeType("bgfx_init_limits_t") BGFXInitLimits value) { nlimits(address(), value); return this; }
     /** Passes the {@code limits} field to the specified {@link java.util.function.Consumer Consumer}. */
@@ -195,29 +222,35 @@ public class BGFXInit extends Struct<BGFXInit> implements NativeResource {
     /** Initializes this struct with the specified values. */
     public BGFXInit set(
         int type,
+        int backendType,
         short vendorId,
         short deviceId,
         long capabilities,
         boolean debug,
+        int diagnostics,
         boolean profile,
         boolean fallback,
         boolean videoDecode,
         BGFXPlatformData platformData,
-        BGFXResolution resolution,
+        BGFXSwapChain swapChain,
+        int reset,
         BGFXInitLimits limits,
         @Nullable BGFXCallbackInterface callback,
         @Nullable BGFXAllocatorInterface allocator
     ) {
         type(type);
+        backendType(backendType);
         vendorId(vendorId);
         deviceId(deviceId);
         capabilities(capabilities);
         debug(debug);
+        diagnostics(diagnostics);
         profile(profile);
         fallback(fallback);
         videoDecode(videoDecode);
         platformData(platformData);
-        resolution(resolution);
+        swapChain(swapChain);
+        reset(reset);
         limits(limits);
         callback(callback);
         allocator(allocator);
@@ -287,6 +320,8 @@ public class BGFXInit extends Struct<BGFXInit> implements NativeResource {
 
     /** Unsafe version of {@link #type}. */
     public static int ntype(long struct) { return memGetInt(struct + BGFXInit.TYPE); }
+    /** Unsafe version of {@link #backendType}. */
+    public static int nbackendType(long struct) { return memGetInt(struct + BGFXInit.BACKENDTYPE); }
     /** Unsafe version of {@link #vendorId}. */
     public static short nvendorId(long struct) { return memGetShort(struct + BGFXInit.VENDORID); }
     /** Unsafe version of {@link #deviceId}. */
@@ -295,6 +330,8 @@ public class BGFXInit extends Struct<BGFXInit> implements NativeResource {
     public static long ncapabilities(long struct) { return memGetLong(struct + BGFXInit.CAPABILITIES); }
     /** Unsafe version of {@link #debug}. */
     public static boolean ndebug(long struct) { return memGetByte(struct + BGFXInit.DEBUG) != 0; }
+    /** Unsafe version of {@link #diagnostics}. */
+    public static int ndiagnostics(long struct) { return memGetInt(struct + BGFXInit.DIAGNOSTICS); }
     /** Unsafe version of {@link #profile}. */
     public static boolean nprofile(long struct) { return memGetByte(struct + BGFXInit.PROFILE) != 0; }
     /** Unsafe version of {@link #fallback}. */
@@ -303,8 +340,10 @@ public class BGFXInit extends Struct<BGFXInit> implements NativeResource {
     public static boolean nvideoDecode(long struct) { return memGetByte(struct + BGFXInit.VIDEODECODE) != 0; }
     /** Unsafe version of {@link #platformData}. */
     public static BGFXPlatformData nplatformData(long struct) { return BGFXPlatformData.create(struct + BGFXInit.PLATFORMDATA); }
-    /** Unsafe version of {@link #resolution}. */
-    public static BGFXResolution nresolution(long struct) { return BGFXResolution.create(struct + BGFXInit.RESOLUTION); }
+    /** Unsafe version of {@link #swapChain}. */
+    public static BGFXSwapChain nswapChain(long struct) { return BGFXSwapChain.create(struct + BGFXInit.SWAPCHAIN); }
+    /** Unsafe version of {@link #reset}. */
+    public static int nreset(long struct) { return memGetInt(struct + BGFXInit.RESET); }
     /** Unsafe version of {@link #limits}. */
     public static BGFXInitLimits nlimits(long struct) { return BGFXInitLimits.create(struct + BGFXInit.LIMITS); }
     /** Unsafe version of {@link #callback}. */
@@ -314,6 +353,8 @@ public class BGFXInit extends Struct<BGFXInit> implements NativeResource {
 
     /** Unsafe version of {@link #type(int) type}. */
     public static void ntype(long struct, int value) { memPutInt(struct + BGFXInit.TYPE, value); }
+    /** Unsafe version of {@link #backendType(int) backendType}. */
+    public static void nbackendType(long struct, int value) { memPutInt(struct + BGFXInit.BACKENDTYPE, value); }
     /** Unsafe version of {@link #vendorId(short) vendorId}. */
     public static void nvendorId(long struct, short value) { memPutShort(struct + BGFXInit.VENDORID, value); }
     /** Unsafe version of {@link #deviceId(short) deviceId}. */
@@ -322,6 +363,8 @@ public class BGFXInit extends Struct<BGFXInit> implements NativeResource {
     public static void ncapabilities(long struct, long value) { memPutLong(struct + BGFXInit.CAPABILITIES, value); }
     /** Unsafe version of {@link #debug(boolean) debug}. */
     public static void ndebug(long struct, boolean value) { memPutByte(struct + BGFXInit.DEBUG, value ? (byte)1 : (byte)0); }
+    /** Unsafe version of {@link #diagnostics(int) diagnostics}. */
+    public static void ndiagnostics(long struct, int value) { memPutInt(struct + BGFXInit.DIAGNOSTICS, value); }
     /** Unsafe version of {@link #profile(boolean) profile}. */
     public static void nprofile(long struct, boolean value) { memPutByte(struct + BGFXInit.PROFILE, value ? (byte)1 : (byte)0); }
     /** Unsafe version of {@link #fallback(boolean) fallback}. */
@@ -330,8 +373,10 @@ public class BGFXInit extends Struct<BGFXInit> implements NativeResource {
     public static void nvideoDecode(long struct, boolean value) { memPutByte(struct + BGFXInit.VIDEODECODE, value ? (byte)1 : (byte)0); }
     /** Unsafe version of {@link #platformData(BGFXPlatformData) platformData}. */
     public static void nplatformData(long struct, BGFXPlatformData value) { memCopy(value.address(), struct + BGFXInit.PLATFORMDATA, BGFXPlatformData.SIZEOF); }
-    /** Unsafe version of {@link #resolution(BGFXResolution) resolution}. */
-    public static void nresolution(long struct, BGFXResolution value) { memCopy(value.address(), struct + BGFXInit.RESOLUTION, BGFXResolution.SIZEOF); }
+    /** Unsafe version of {@link #swapChain(BGFXSwapChain) swapChain}. */
+    public static void nswapChain(long struct, BGFXSwapChain value) { memCopy(value.address(), struct + BGFXInit.SWAPCHAIN, BGFXSwapChain.SIZEOF); }
+    /** Unsafe version of {@link #reset(int) reset}. */
+    public static void nreset(long struct, int value) { memPutInt(struct + BGFXInit.RESET, value); }
     /** Unsafe version of {@link #limits(BGFXInitLimits) limits}. */
     public static void nlimits(long struct, BGFXInitLimits value) { memCopy(value.address(), struct + BGFXInit.LIMITS, BGFXInitLimits.SIZEOF); }
     /** Unsafe version of {@link #callback(BGFXCallbackInterface) callback}. */

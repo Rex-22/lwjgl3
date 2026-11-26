@@ -28,6 +28,13 @@ import static org.lwjgl.bgfx.BGFX.BGFX_TOPOLOGY_COUNT;
  *     int64_t gpuTimerFreq;
  *     int64_t waitRender;
  *     int64_t waitSubmit;
+ *     int64_t latencySleep;
+ *     int64_t latencyTotal;
+ *     int64_t latencySimulation;
+ *     int64_t latencyRenderSubmit;
+ *     int64_t latencyPresent;
+ *     int64_t latencyQueue;
+ *     int64_t latencyGpu;
  *     uint32_t numDraw;
  *     uint32_t numCompute;
  *     uint32_t numBlit;
@@ -57,7 +64,7 @@ import static org.lwjgl.bgfx.BGFX.BGFX_TOPOLOGY_COUNT;
  *     uint16_t height;
  *     uint16_t textWidth;
  *     uint16_t textHeight;
- *     uint16_t numViews;
+ *     uint16_t numViewStats;
  *     {@link BGFXViewStats bgfx_view_stats_t} * viewStats;
  *     uint16_t numEncoders;
  *     {@link BGFXEncoderStats bgfx_encoder_stats_t} * encoderStats;
@@ -83,6 +90,13 @@ public class BGFXStats extends Struct<BGFXStats> {
         GPUTIMERFREQ,
         WAITRENDER,
         WAITSUBMIT,
+        LATENCYSLEEP,
+        LATENCYTOTAL,
+        LATENCYSIMULATION,
+        LATENCYRENDERSUBMIT,
+        LATENCYPRESENT,
+        LATENCYQUEUE,
+        LATENCYGPU,
         NUMDRAW,
         NUMCOMPUTE,
         NUMBLIT,
@@ -112,13 +126,20 @@ public class BGFXStats extends Struct<BGFXStats> {
         HEIGHT,
         TEXTWIDTH,
         TEXTHEIGHT,
-        NUMVIEWS,
+        NUMVIEWSTATS,
         VIEWSTATS,
         NUMENCODERS,
         ENCODERSTATS;
 
     static {
         Layout layout = __struct(
+            __member(8),
+            __member(8),
+            __member(8),
+            __member(8),
+            __member(8),
+            __member(8),
+            __member(8),
             __member(8),
             __member(8),
             __member(8),
@@ -175,39 +196,46 @@ public class BGFXStats extends Struct<BGFXStats> {
         GPUTIMERFREQ = layout.offsetof(6);
         WAITRENDER = layout.offsetof(7);
         WAITSUBMIT = layout.offsetof(8);
-        NUMDRAW = layout.offsetof(9);
-        NUMCOMPUTE = layout.offsetof(10);
-        NUMBLIT = layout.offsetof(11);
-        NUMBLITREPACK = layout.offsetof(12);
-        NUMDRAWCALLSPEAK = layout.offsetof(13);
-        MAXGPULATENCY = layout.offsetof(14);
-        GPUFRAMENUM = layout.offsetof(15);
-        NUMDYNAMICINDEXBUFFERS = layout.offsetof(16);
-        NUMDYNAMICVERTEXBUFFERS = layout.offsetof(17);
-        NUMFRAMEBUFFERS = layout.offsetof(18);
-        NUMINDEXBUFFERS = layout.offsetof(19);
-        NUMOCCLUSIONQUERIES = layout.offsetof(20);
-        NUMPROGRAMS = layout.offsetof(21);
-        NUMSHADERS = layout.offsetof(22);
-        NUMTEXTURES = layout.offsetof(23);
-        NUMUNIFORMS = layout.offsetof(24);
-        NUMVERTEXBUFFERS = layout.offsetof(25);
-        NUMVERTEXLAYOUTS = layout.offsetof(26);
-        TEXTUREMEMORYUSED = layout.offsetof(27);
-        RTMEMORYUSED = layout.offsetof(28);
-        TRANSIENTVBUSED = layout.offsetof(29);
-        TRANSIENTIBUSED = layout.offsetof(30);
-        NUMPRIMS = layout.offsetof(31);
-        GPUMEMORYMAX = layout.offsetof(32);
-        GPUMEMORYUSED = layout.offsetof(33);
-        WIDTH = layout.offsetof(34);
-        HEIGHT = layout.offsetof(35);
-        TEXTWIDTH = layout.offsetof(36);
-        TEXTHEIGHT = layout.offsetof(37);
-        NUMVIEWS = layout.offsetof(38);
-        VIEWSTATS = layout.offsetof(39);
-        NUMENCODERS = layout.offsetof(40);
-        ENCODERSTATS = layout.offsetof(41);
+        LATENCYSLEEP = layout.offsetof(9);
+        LATENCYTOTAL = layout.offsetof(10);
+        LATENCYSIMULATION = layout.offsetof(11);
+        LATENCYRENDERSUBMIT = layout.offsetof(12);
+        LATENCYPRESENT = layout.offsetof(13);
+        LATENCYQUEUE = layout.offsetof(14);
+        LATENCYGPU = layout.offsetof(15);
+        NUMDRAW = layout.offsetof(16);
+        NUMCOMPUTE = layout.offsetof(17);
+        NUMBLIT = layout.offsetof(18);
+        NUMBLITREPACK = layout.offsetof(19);
+        NUMDRAWCALLSPEAK = layout.offsetof(20);
+        MAXGPULATENCY = layout.offsetof(21);
+        GPUFRAMENUM = layout.offsetof(22);
+        NUMDYNAMICINDEXBUFFERS = layout.offsetof(23);
+        NUMDYNAMICVERTEXBUFFERS = layout.offsetof(24);
+        NUMFRAMEBUFFERS = layout.offsetof(25);
+        NUMINDEXBUFFERS = layout.offsetof(26);
+        NUMOCCLUSIONQUERIES = layout.offsetof(27);
+        NUMPROGRAMS = layout.offsetof(28);
+        NUMSHADERS = layout.offsetof(29);
+        NUMTEXTURES = layout.offsetof(30);
+        NUMUNIFORMS = layout.offsetof(31);
+        NUMVERTEXBUFFERS = layout.offsetof(32);
+        NUMVERTEXLAYOUTS = layout.offsetof(33);
+        TEXTUREMEMORYUSED = layout.offsetof(34);
+        RTMEMORYUSED = layout.offsetof(35);
+        TRANSIENTVBUSED = layout.offsetof(36);
+        TRANSIENTIBUSED = layout.offsetof(37);
+        NUMPRIMS = layout.offsetof(38);
+        GPUMEMORYMAX = layout.offsetof(39);
+        GPUMEMORYUSED = layout.offsetof(40);
+        WIDTH = layout.offsetof(41);
+        HEIGHT = layout.offsetof(42);
+        TEXTWIDTH = layout.offsetof(43);
+        TEXTHEIGHT = layout.offsetof(44);
+        NUMVIEWSTATS = layout.offsetof(45);
+        VIEWSTATS = layout.offsetof(46);
+        NUMENCODERS = layout.offsetof(47);
+        ENCODERSTATS = layout.offsetof(48);
     }
 
     protected BGFXStats(long address, @Nullable ByteBuffer container) {
@@ -259,6 +287,27 @@ public class BGFXStats extends Struct<BGFXStats> {
     /** @return the value of the {@code waitSubmit} field. */
     @NativeType("int64_t")
     public long waitSubmit() { return nwaitSubmit(address()); }
+    /** @return the value of the {@code latencySleep} field. */
+    @NativeType("int64_t")
+    public long latencySleep() { return nlatencySleep(address()); }
+    /** @return the value of the {@code latencyTotal} field. */
+    @NativeType("int64_t")
+    public long latencyTotal() { return nlatencyTotal(address()); }
+    /** @return the value of the {@code latencySimulation} field. */
+    @NativeType("int64_t")
+    public long latencySimulation() { return nlatencySimulation(address()); }
+    /** @return the value of the {@code latencyRenderSubmit} field. */
+    @NativeType("int64_t")
+    public long latencyRenderSubmit() { return nlatencyRenderSubmit(address()); }
+    /** @return the value of the {@code latencyPresent} field. */
+    @NativeType("int64_t")
+    public long latencyPresent() { return nlatencyPresent(address()); }
+    /** @return the value of the {@code latencyQueue} field. */
+    @NativeType("int64_t")
+    public long latencyQueue() { return nlatencyQueue(address()); }
+    /** @return the value of the {@code latencyGpu} field. */
+    @NativeType("int64_t")
+    public long latencyGpu() { return nlatencyGpu(address()); }
     /** @return the value of the {@code numDraw} field. */
     @NativeType("uint32_t")
     public int numDraw() { return nnumDraw(address()); }
@@ -349,9 +398,9 @@ public class BGFXStats extends Struct<BGFXStats> {
     /** @return the value of the {@code textHeight} field. */
     @NativeType("uint16_t")
     public short textHeight() { return ntextHeight(address()); }
-    /** @return the value of the {@code numViews} field. */
+    /** @return the value of the {@code numViewStats} field. */
     @NativeType("uint16_t")
-    public short numViews() { return nnumViews(address()); }
+    public short numViewStats() { return nnumViewStats(address()); }
     /** @return a {@link BGFXViewStats.Buffer} view of the struct array pointed to by the {@code viewStats} field. */
     @NativeType("bgfx_view_stats_t *")
     public BGFXViewStats.Buffer viewStats() { return nviewStats(address()); }
@@ -409,6 +458,20 @@ public class BGFXStats extends Struct<BGFXStats> {
     public static long nwaitRender(long struct) { return memGetLong(struct + BGFXStats.WAITRENDER); }
     /** Unsafe version of {@link #waitSubmit}. */
     public static long nwaitSubmit(long struct) { return memGetLong(struct + BGFXStats.WAITSUBMIT); }
+    /** Unsafe version of {@link #latencySleep}. */
+    public static long nlatencySleep(long struct) { return memGetLong(struct + BGFXStats.LATENCYSLEEP); }
+    /** Unsafe version of {@link #latencyTotal}. */
+    public static long nlatencyTotal(long struct) { return memGetLong(struct + BGFXStats.LATENCYTOTAL); }
+    /** Unsafe version of {@link #latencySimulation}. */
+    public static long nlatencySimulation(long struct) { return memGetLong(struct + BGFXStats.LATENCYSIMULATION); }
+    /** Unsafe version of {@link #latencyRenderSubmit}. */
+    public static long nlatencyRenderSubmit(long struct) { return memGetLong(struct + BGFXStats.LATENCYRENDERSUBMIT); }
+    /** Unsafe version of {@link #latencyPresent}. */
+    public static long nlatencyPresent(long struct) { return memGetLong(struct + BGFXStats.LATENCYPRESENT); }
+    /** Unsafe version of {@link #latencyQueue}. */
+    public static long nlatencyQueue(long struct) { return memGetLong(struct + BGFXStats.LATENCYQUEUE); }
+    /** Unsafe version of {@link #latencyGpu}. */
+    public static long nlatencyGpu(long struct) { return memGetLong(struct + BGFXStats.LATENCYGPU); }
     /** Unsafe version of {@link #numDraw}. */
     public static int nnumDraw(long struct) { return memGetInt(struct + BGFXStats.NUMDRAW); }
     /** Unsafe version of {@link #numCompute}. */
@@ -471,10 +534,10 @@ public class BGFXStats extends Struct<BGFXStats> {
     public static short ntextWidth(long struct) { return memGetShort(struct + BGFXStats.TEXTWIDTH); }
     /** Unsafe version of {@link #textHeight}. */
     public static short ntextHeight(long struct) { return memGetShort(struct + BGFXStats.TEXTHEIGHT); }
-    /** Unsafe version of {@link #numViews}. */
-    public static short nnumViews(long struct) { return memGetShort(struct + BGFXStats.NUMVIEWS); }
+    /** Unsafe version of {@link #numViewStats}. */
+    public static short nnumViewStats(long struct) { return memGetShort(struct + BGFXStats.NUMVIEWSTATS); }
     /** Unsafe version of {@link #viewStats}. */
-    public static BGFXViewStats.Buffer nviewStats(long struct) { return BGFXViewStats.create(memGetAddress(struct + BGFXStats.VIEWSTATS), Short.toUnsignedInt(nnumViews(struct))); }
+    public static BGFXViewStats.Buffer nviewStats(long struct) { return BGFXViewStats.create(memGetAddress(struct + BGFXStats.VIEWSTATS), Short.toUnsignedInt(nnumViewStats(struct))); }
     /** Unsafe version of {@link #numEncoders}. */
     public static short nnumEncoders(long struct) { return memGetShort(struct + BGFXStats.NUMENCODERS); }
     /** Unsafe version of {@link #encoderStats}. */
@@ -550,6 +613,27 @@ public class BGFXStats extends Struct<BGFXStats> {
         /** @return the value of the {@code waitSubmit} field. */
         @NativeType("int64_t")
         public long waitSubmit() { return BGFXStats.nwaitSubmit(address()); }
+        /** @return the value of the {@code latencySleep} field. */
+        @NativeType("int64_t")
+        public long latencySleep() { return BGFXStats.nlatencySleep(address()); }
+        /** @return the value of the {@code latencyTotal} field. */
+        @NativeType("int64_t")
+        public long latencyTotal() { return BGFXStats.nlatencyTotal(address()); }
+        /** @return the value of the {@code latencySimulation} field. */
+        @NativeType("int64_t")
+        public long latencySimulation() { return BGFXStats.nlatencySimulation(address()); }
+        /** @return the value of the {@code latencyRenderSubmit} field. */
+        @NativeType("int64_t")
+        public long latencyRenderSubmit() { return BGFXStats.nlatencyRenderSubmit(address()); }
+        /** @return the value of the {@code latencyPresent} field. */
+        @NativeType("int64_t")
+        public long latencyPresent() { return BGFXStats.nlatencyPresent(address()); }
+        /** @return the value of the {@code latencyQueue} field. */
+        @NativeType("int64_t")
+        public long latencyQueue() { return BGFXStats.nlatencyQueue(address()); }
+        /** @return the value of the {@code latencyGpu} field. */
+        @NativeType("int64_t")
+        public long latencyGpu() { return BGFXStats.nlatencyGpu(address()); }
         /** @return the value of the {@code numDraw} field. */
         @NativeType("uint32_t")
         public int numDraw() { return BGFXStats.nnumDraw(address()); }
@@ -640,9 +724,9 @@ public class BGFXStats extends Struct<BGFXStats> {
         /** @return the value of the {@code textHeight} field. */
         @NativeType("uint16_t")
         public short textHeight() { return BGFXStats.ntextHeight(address()); }
-        /** @return the value of the {@code numViews} field. */
+        /** @return the value of the {@code numViewStats} field. */
         @NativeType("uint16_t")
-        public short numViews() { return BGFXStats.nnumViews(address()); }
+        public short numViewStats() { return BGFXStats.nnumViewStats(address()); }
         /** @return a {@link BGFXViewStats.Buffer} view of the struct array pointed to by the {@code viewStats} field. */
         @NativeType("bgfx_view_stats_t *")
         public BGFXViewStats.Buffer viewStats() { return BGFXStats.nviewStats(address()); }

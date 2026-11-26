@@ -18,6 +18,7 @@ import static org.lwjgl.system.MemoryUtil.*;
  * struct bgfx_view_stats_t {
  *     char name[256];
  *     bgfx_view_id_t view;
+ *     bgfx_view_stats_type_t type;
  *     int64_t cpuTimeBegin;
  *     int64_t cpuTimeEnd;
  *     int64_t gpuTimeBegin;
@@ -38,6 +39,7 @@ public class BGFXViewStats extends Struct<BGFXViewStats> {
     public static final int
         NAME,
         VIEW,
+        TYPE,
         CPUTIMEBEGIN,
         CPUTIMEEND,
         GPUTIMEBEGIN,
@@ -48,6 +50,7 @@ public class BGFXViewStats extends Struct<BGFXViewStats> {
         Layout layout = __struct(
             __array(1, 256),
             __member(2),
+            __member(4),
             __member(8),
             __member(8),
             __member(8),
@@ -60,11 +63,12 @@ public class BGFXViewStats extends Struct<BGFXViewStats> {
 
         NAME = layout.offsetof(0);
         VIEW = layout.offsetof(1);
-        CPUTIMEBEGIN = layout.offsetof(2);
-        CPUTIMEEND = layout.offsetof(3);
-        GPUTIMEBEGIN = layout.offsetof(4);
-        GPUTIMEEND = layout.offsetof(5);
-        GPUFRAMENUM = layout.offsetof(6);
+        TYPE = layout.offsetof(2);
+        CPUTIMEBEGIN = layout.offsetof(3);
+        CPUTIMEEND = layout.offsetof(4);
+        GPUTIMEBEGIN = layout.offsetof(5);
+        GPUTIMEEND = layout.offsetof(6);
+        GPUFRAMENUM = layout.offsetof(7);
     }
 
     protected BGFXViewStats(long address, @Nullable ByteBuffer container) {
@@ -98,6 +102,9 @@ public class BGFXViewStats extends Struct<BGFXViewStats> {
     /** @return the value of the {@code view} field. */
     @NativeType("bgfx_view_id_t")
     public short view() { return nview(address()); }
+    /** @return the value of the {@code type} field. */
+    @NativeType("bgfx_view_stats_type_t")
+    public int type() { return ntype(address()); }
     /** @return the value of the {@code cpuTimeBegin} field. */
     @NativeType("int64_t")
     public long cpuTimeBegin() { return ncpuTimeBegin(address()); }
@@ -149,6 +156,8 @@ public class BGFXViewStats extends Struct<BGFXViewStats> {
     public static String nnameString(long struct) { return memASCII(struct + BGFXViewStats.NAME); }
     /** Unsafe version of {@link #view}. */
     public static short nview(long struct) { return memGetShort(struct + BGFXViewStats.VIEW); }
+    /** Unsafe version of {@link #type}. */
+    public static int ntype(long struct) { return memGetInt(struct + BGFXViewStats.TYPE); }
     /** Unsafe version of {@link #cpuTimeBegin}. */
     public static long ncpuTimeBegin(long struct) { return memGetLong(struct + BGFXViewStats.CPUTIMEBEGIN); }
     /** Unsafe version of {@link #cpuTimeEnd}. */
@@ -212,6 +221,9 @@ public class BGFXViewStats extends Struct<BGFXViewStats> {
         /** @return the value of the {@code view} field. */
         @NativeType("bgfx_view_id_t")
         public short view() { return BGFXViewStats.nview(address()); }
+        /** @return the value of the {@code type} field. */
+        @NativeType("bgfx_view_stats_type_t")
+        public int type() { return BGFXViewStats.ntype(address()); }
         /** @return the value of the {@code cpuTimeBegin} field. */
         @NativeType("int64_t")
         public long cpuTimeBegin() { return BGFXViewStats.ncpuTimeBegin(address()); }
