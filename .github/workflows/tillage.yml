@@ -129,10 +129,10 @@ jobs:
 
   linux:
     name: Linux ${{ matrix.arch }}
-    # AlmaLinux 8 (glibc 2.28), as upstream LWJGL, so the libraries load on older distributions.
+    # AlmaLinux 9 (glibc 2.34): bx needs glibc 2.31 or newer, so upstream LWJGL's AlmaLinux 8 is too old.
     runs-on: ${{ matrix.runner }}
     container:
-      image: almalinux:8
+      image: almalinux:9
     strategy:
       fail-fast: false
       matrix:
@@ -150,10 +150,16 @@ jobs:
     steps:
       - name: Install build dependencies
         run: |
-          dnf -y install epel-release
-          dnf config-manager --set-enabled powertools
-          dnf -y install git gcc-toolset-15-gcc gcc-toolset-15-gcc-c++ gcc-toolset-15-libatomic-devel ant make cmake ninja-build \
+          dnf -y install epel-release dnf-plugins-core
+          dnf config-manager --set-enabled crb
+          dnf -y install git ant make cmake ninja-build \
             libX11-devel libXt-devel gtk3-devel dbus-devel mesa-libGL-devel mesa-libEGL-devel wayland-devel
+          for v in 15 14; do
+            if dnf -y install gcc-toolset-$v-gcc gcc-toolset-$v-gcc-c++ gcc-toolset-$v-libatomic-devel; then
+              echo "TOOLSET=/opt/rh/gcc-toolset-$v/enable" >> "$GITHUB_ENV"
+              break
+            fi
+          done
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
@@ -163,7 +169,7 @@ jobs:
           java-version: 25
       - name: Build liblwjgl
         run: |
-          source /opt/rh/gcc-toolset-15/enable
+          source "$TOOLSET"
           git config --global --add safe.directory "$PWD"
           ant -emacs compile-templates compile compile-native
           mkdir -p out
@@ -171,7 +177,7 @@ jobs:
           git rev-parse HEAD > out/liblwjgl.so.git
       - name: Build libbgfx
         run: |
-          source /opt/rh/gcc-toolset-15/enable
+          source "$TOOLSET"
           bash tillage/build-bgfx.sh "$BGFX_CMAKE_TAG" out
       - uses: actions/upload-artifact@v4
         with:
