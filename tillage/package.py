@@ -41,10 +41,12 @@ PLATFORMS = {
     "natives-windows-arm64": ("windows/arm64", "", ".dll"),
 }
 
-# Core classes that the generator rewrites when binding signatures change.
+# Core classes that the generator rewrites when binding signatures change. On JDK 25 and later, JNI calls through the
+# nested JNIBindings interface (FFM downcalls), so it must match JNI.class: upstream's copy lacks the new invokers.
 CORE_CLASSES = [
     "org/lwjgl/system/JNI.class",
     "META-INF/versions/25/org/lwjgl/system/JNI.class",
+    "META-INF/versions/25/org/lwjgl/system/JNI$JNIBindings.class",
 ]
 
 
